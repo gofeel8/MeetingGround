@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">KakaoMsg</string>
-    <string name="kakao_app_key">6af09445e40d31b41972d5578ce2237a</string>
-    <string name="kakao_scheme">kakao6af09445e40d31b41972d5578ce2237a</string>
-    <string name="kakaolink_host">kakaolink</string>
-</resources>
