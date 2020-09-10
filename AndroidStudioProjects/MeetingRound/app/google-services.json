@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "15648627912",
+    "firebase_url": "https://meeting-round.firebaseio.com",
+    "project_id": "meeting-round",
+    "storage_bucket": "meeting-round.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15648627912:android:398182fae22122fa85d9fd",
+        "android_client_info": {
+          "package_name": "com.mgmg.meetinground"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "15648627912-potcbsnhvrannlst979j3iruta83ukbr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mgmg.meetinground",
+            "certificate_hash": "4e3613377b9fa816400f60faad943ee22a2a6c04"
+          }
+        },
+        {
+          "client_id": "15648627912-tnt6im2h79flklmelc40n03f2ra7tbhi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLyJ5XIm1ZogJMgy_hVlhto95qJt2T2gE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "15648627912-tnt6im2h79flklmelc40n03f2ra7tbhi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
