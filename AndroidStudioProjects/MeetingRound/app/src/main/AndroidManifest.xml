@@ -13,8 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".RoomActivity"
-            android:parentActivityName=".IndexActivity"></activity>
+        <activity android:name=".RoomActivity"></activity>
         <activity android:name=".IndexActivity" />
         <activity
             android:name=".MainActivity"

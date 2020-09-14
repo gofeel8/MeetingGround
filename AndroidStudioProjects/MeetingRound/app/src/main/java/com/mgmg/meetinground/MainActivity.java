@@ -1,43 +1,30 @@
 package com.mgmg.meetinground;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.kakao.auth.ApiErrorCode;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
+import com.kakao.kakaotalk.callback.TalkResponseCallback;
+import com.kakao.kakaotalk.response.KakaoTalkProfile;
+import com.kakao.kakaotalk.v2.KakaoTalkService;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.LoginButton;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;
-import com.kakao.util.OptionalBoolean;
 import com.kakao.util.exception.KakaoException;
-
-import java.security.MessageDigest;
 
 public class MainActivity extends Activity {
 
     Uri uri;
+    String uid, name, profile, roomId;
 
     // 세션 콜백 구현
     private ISessionCallback sessionCallback = new ISessionCallback() {
@@ -58,12 +45,45 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void onSuccess(MeV2Response result) {
-                    Intent intent = new Intent(getApplicationContext(), IndexActivity.class);
-                    intent.putExtra("id", result.getId()+"");
+
+                    uid = result.getId()+"";
                     if (uri != null)
-                        intent.putExtra("roomId", uri.getQueryParameter("id"));
-                    startActivity(intent);
-                    finish();
+                        roomId = uri.getQueryParameter("id");
+
+                    KakaoTalkService.getInstance()
+                            .requestProfile(new TalkResponseCallback<KakaoTalkProfile>() {
+                                @Override
+                                public void onNotKakaoTalkUser() {
+                                    Log.e("KAKAO_API", "카카오톡 사용자가 아님");
+                                }
+
+                                @Override
+                                public void onSessionClosed(ErrorResult errorResult) {
+                                    Log.e("KAKAO_API", "세션이 닫혀 있음: " + errorResult);
+                                }
+
+                                @Override
+                                public void onFailure(ErrorResult errorResult) {
+                                    Log.e("KAKAO_API", "카카오톡 프로필 조회 실패: " + errorResult);
+                                }
+
+                                @Override
+                                public void onSuccess(KakaoTalkProfile result) {
+                                    Log.i("KAKAO_API", "카카오톡 닉네임: " + result.getNickName());
+                                    Log.i("KAKAO_API", "카카오톡 프로필이미지: " + result.getProfileImageUrl());
+
+                                    name = result.getNickName();
+                                    profile = result.getProfileImageUrl();
+
+                                    Intent intent = new Intent(getApplicationContext(), IndexActivity.class);
+                                    intent.putExtra("id", uid);
+                                    intent.putExtra("profile", profile);
+                                    intent.putExtra("name", name);
+                                    intent.putExtra("roomId", roomId);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            });
                 }
             });
         }

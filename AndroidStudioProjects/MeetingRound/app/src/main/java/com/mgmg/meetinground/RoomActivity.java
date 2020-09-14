@@ -1,7 +1,6 @@
 package com.mgmg.meetinground;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -11,13 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
 import com.kakao.kakaolink.v2.KakaoLinkResponse;
 import com.kakao.kakaolink.v2.KakaoLinkService;
 import com.kakao.network.ErrorResult;
@@ -30,7 +27,7 @@ import java.util.Map;
 
 public class RoomActivity extends AppCompatActivity {
 
-    String id, profile, name, roomId;
+    String uid, profile, name, roomId;
     DatabaseReference database;
     UserAdapter userAdapter;
     List<MyUser> list;
@@ -41,7 +38,7 @@ public class RoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_room);
 
         Intent intent = getIntent();
-        id = intent.getStringExtra("id");
+        uid = intent.getStringExtra("id");
         profile = intent.getStringExtra("profile");
         name = intent.getStringExtra("name");
         roomId = intent.getStringExtra("roomId");
@@ -49,9 +46,9 @@ public class RoomActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance().getReference();
 
         if (intent.getBooleanExtra("isFirst", false)) {
-            database.child("users").child(id).child("rooms").child(roomId).setValue(true);
+            database.child("users").child(uid).child("rooms").child(roomId).setValue(true);
         }
-        database.child("rooms").child(roomId).child("users").child(id).setValue(new MyUser(name, profile));
+        database.child("rooms").child(roomId).child("users").child(uid).setValue(new MyUser(name, profile));
 
         ListView lvUsers = findViewById(R.id.lvUsers);
         Button btnSend = findViewById(R.id.btnSend);
@@ -113,8 +110,8 @@ public class RoomActivity extends AppCompatActivity {
         btnExit.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                database.child("users").child(id).child("rooms").child(roomId).setValue(null);
-                database.child("rooms").child(roomId).child("users").child(id).setValue(null);
+                database.child("users").child(uid).child("rooms").child(roomId).setValue(null);
+                database.child("rooms").child(roomId).child("users").child(uid).setValue(null);
                 finish();
             }
         });
