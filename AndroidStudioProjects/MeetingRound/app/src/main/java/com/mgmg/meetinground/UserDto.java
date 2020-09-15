@@ -5,14 +5,14 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import java.util.List;
 
 @IgnoreExtraProperties
-public class MyUser {
+public class UserDto {
 
     private String name;
     private String profile;
 
-    public MyUser(){};
+    public UserDto(){};
 
-    public MyUser(String name, String profile) {
+    public UserDto(String name, String profile) {
         this.name = name;
         this.profile = profile;
     }

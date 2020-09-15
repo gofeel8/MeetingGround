@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
@@ -24,7 +25,7 @@ import com.kakao.util.exception.KakaoException;
 public class MainActivity extends Activity {
 
     Uri uri;
-    String uid, name, profile, roomId;
+    String uid, name, profile, roomId, roomName;
 
     // 세션 콜백 구현
     private ISessionCallback sessionCallback = new ISessionCallback() {
@@ -47,8 +48,10 @@ public class MainActivity extends Activity {
                 public void onSuccess(MeV2Response result) {
 
                     uid = result.getId()+"";
-                    if (uri != null)
-                        roomId = uri.getQueryParameter("id");
+                    if (uri != null) {
+                        roomId =  uri.getQueryParameter("roomId");
+                        roomName = uri.getQueryParameter("roomName");
+                    }
 
                     KakaoTalkService.getInstance()
                             .requestProfile(new TalkResponseCallback<KakaoTalkProfile>() {
@@ -76,10 +79,11 @@ public class MainActivity extends Activity {
                                     profile = result.getProfileImageUrl();
 
                                     Intent intent = new Intent(getApplicationContext(), IndexActivity.class);
-                                    intent.putExtra("id", uid);
+                                    intent.putExtra("uid", uid);
                                     intent.putExtra("profile", profile);
                                     intent.putExtra("name", name);
                                     intent.putExtra("roomId", roomId);
+                                    intent.putExtra("roomName", roomName);
                                     startActivity(intent);
                                     finish();
                                 }

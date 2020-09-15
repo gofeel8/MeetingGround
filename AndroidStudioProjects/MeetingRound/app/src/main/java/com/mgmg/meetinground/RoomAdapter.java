@@ -12,9 +12,9 @@ import java.util.List;
 public class RoomAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private List<String> list;
+    private List<RoomDto> list;
 
-    public RoomAdapter(Context context, List<String> list) {
+    public RoomAdapter(Context context, List<RoomDto> list) {
         this.context = context;
         this.list = list;
         this.layoutInflater = LayoutInflater.from(context);
@@ -40,7 +40,7 @@ public class RoomAdapter extends BaseAdapter {
         View view = layoutInflater.inflate(R.layout.list_room, null);
 
         TextView tvRoomId = view.findViewById(R.id.tvRoomId);
-        tvRoomId.setText(list.get(position));
+        tvRoomId.setText(list.get(position).getRoomName());
 
         return view;
     }

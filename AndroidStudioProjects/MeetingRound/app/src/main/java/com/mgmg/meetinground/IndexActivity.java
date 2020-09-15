@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
@@ -28,10 +29,14 @@ import java.util.List;
 
 public class IndexActivity extends AppCompatActivity {
 
-    String uid, name, profile, roomId;
+    String uid, name, profile, roomId, roomName;
     DatabaseReference database;
-    List<String> list;
+    List<RoomDto> list;
     RoomAdapter roomAdapter;
+    ListView lvRooms;
+    Button btnMake, btnLogout;
+    ImageView ivProfile;
+    TextView tvId ,tvNickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,30 +44,32 @@ public class IndexActivity extends AppCompatActivity {
         setContentView(R.layout.activity_index);
 
         Intent intent = getIntent();
-        uid = intent.getStringExtra("id");
+        uid = intent.getStringExtra("uid");
         profile = intent.getStringExtra("profile");
         name = intent.getStringExtra("name");
         roomId = intent.getStringExtra("roomId");
+        roomName = intent.getStringExtra("roomName");
 
         database = FirebaseDatabase.getInstance().getReference();
 
-        if (roomId!=null) {
+        if (roomId != null) {
             // roomId가 null이 아니라면 초대를 받은 사용자. 바로 방으로 이동시켜야 함.
             Intent directIntent = new Intent(getApplicationContext(), RoomActivity.class);
-            intent.putExtra("id", uid);
-            intent.putExtra("profile", profile);
-            intent.putExtra("name", name);
-            intent.putExtra("roomId", roomId);
-            intent.putExtra("isFirst", true);
+            directIntent.putExtra("uid", uid);
+            directIntent.putExtra("profile", profile);
+            directIntent.putExtra("name", name);
+            directIntent.putExtra("roomId", roomId);
+            directIntent.putExtra("roomName", roomName);
+            directIntent.putExtra("isFirst", true);
             startActivity(directIntent);
         }
 
-        ListView lvRooms = findViewById(R.id.lvRooms);
-        Button btnMake = findViewById(R.id.btnMake);
-        Button btnLogout = findViewById(R.id.btnLogout);
-        ImageView ivProfile = findViewById(R.id.ivProfile);
-        TextView tvId = findViewById(R.id.tvId);
-        TextView tvNickname = findViewById(R.id.tvName);
+        lvRooms = findViewById(R.id.lvRooms);
+        btnMake = findViewById(R.id.btnMake);
+        btnLogout = findViewById(R.id.btnLogout);
+        ivProfile = findViewById(R.id.ivProfile);
+        tvId = findViewById(R.id.tvId);
+        tvNickname = findViewById(R.id.tvName);
 
         Glide.with(this).load(profile).into(ivProfile);
         tvId.setText(uid);
@@ -75,7 +82,7 @@ public class IndexActivity extends AppCompatActivity {
         database.child("users").child(uid).child("rooms").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                list.add(snapshot.getKey());
+                list.add(new RoomDto(snapshot.getKey(), snapshot.getValue().toString()));
                 roomAdapter.notifyDataSetChanged();
             }
 
@@ -85,7 +92,11 @@ public class IndexActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                list.remove(snapshot.getKey());
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).getRoomId().equals(snapshot.getKey())) {
+                        list.remove(i);
+                    }
+                }
                 roomAdapter.notifyDataSetChanged();
             }
 
@@ -103,22 +114,16 @@ public class IndexActivity extends AppCompatActivity {
         lvRooms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), RoomActivity.class);
-                intent.putExtra("id", uid);
-                intent.putExtra("profile", profile);
-                intent.putExtra("name", name);
-                intent.putExtra("roomId", list.get(position));
-
-                startActivity(intent);
+                enter(list.get(position).getRoomId(), list.get(position).getRoomName());
             }
         });
 
         btnMake.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String roomId = database.child("users").child(uid).child("rooms").push().getKey();
-                database.child("users").child(uid).child("rooms").child(roomId).setValue(true);
-                database.child("rooms").child(roomId).child("users").child(uid).setValue(new MyUser(name, profile));
+                Intent intent = new Intent(getApplicationContext(), MakeActivity.class);
+                intent.putExtra("name", name);
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -137,5 +142,33 @@ public class IndexActivity extends AppCompatActivity {
                         });
             }
         });
+    }
+
+    public void enter(String roomId, String roomName) {
+        Intent intent = new Intent(getApplicationContext(), RoomActivity.class);
+        intent.putExtra("uid", uid);
+        intent.putExtra("profile", profile);
+        intent.putExtra("name", name);
+        intent.putExtra("roomId", roomId);
+        intent.putExtra("roomName", roomName);
+
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) {
+            String roomId = database.child("users").child(uid).child("rooms").push().getKey();
+            String roomName = data.getStringExtra("roomName");
+            long timestamp = data.getLongExtra("timestamp", 0);
+
+            database.child("users").child(uid).child("rooms").child(roomId).setValue(roomName);
+            database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
+            database.child("rooms").child(roomId).child("settings").child("title").setValue(roomName);
+            database.child("rooms").child(roomId).child("settings").child("time").setValue(timestamp);
+            enter(roomId, roomName);
+        }
     }
 }

@@ -15,9 +15,9 @@ import java.util.List;
 public class UserAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private List<MyUser> list;
+    private List<UserDto> list;
 
-    public UserAdapter(Context context, List<MyUser> list) {
+    public UserAdapter(Context context, List<UserDto> list) {
         this.context = context;
         this.list = list;
         this.layoutInflater = LayoutInflater.from(context);

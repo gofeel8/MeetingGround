@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,10 +28,13 @@ import java.util.Map;
 
 public class RoomActivity extends AppCompatActivity {
 
-    String uid, profile, name, roomId;
+    String uid, profile, name, roomId, roomName;
     DatabaseReference database;
     UserAdapter userAdapter;
-    List<MyUser> list;
+    List<UserDto> list;
+    ListView lvUsers;
+    TextView tvRoomName;
+    Button btnSend, btnExit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,25 +42,28 @@ public class RoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_room);
 
         Intent intent = getIntent();
-        uid = intent.getStringExtra("id");
+        uid = intent.getStringExtra("uid");
         profile = intent.getStringExtra("profile");
         name = intent.getStringExtra("name");
         roomId = intent.getStringExtra("roomId");
+        roomName = intent.getStringExtra("roomName");
 
         database = FirebaseDatabase.getInstance().getReference();
 
         if (intent.getBooleanExtra("isFirst", false)) {
-            database.child("users").child(uid).child("rooms").child(roomId).setValue(true);
+            database.child("users").child(uid).child("rooms").child(roomId).setValue(roomName);
         }
-        database.child("rooms").child(roomId).child("users").child(uid).setValue(new MyUser(name, profile));
+        database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
 
-        ListView lvUsers = findViewById(R.id.lvUsers);
-        Button btnSend = findViewById(R.id.btnSend);
-        Button btnExit = findViewById(R.id.btnExit);
+        lvUsers = findViewById(R.id.lvUsers);
+        tvRoomName = findViewById(R.id.tvRoomName);
+        btnSend = findViewById(R.id.btnSend);
+        btnExit = findViewById(R.id.btnExit);
 
         list = new ArrayList<>();
         userAdapter = new UserAdapter(getApplicationContext(), list);
         lvUsers.setAdapter(userAdapter);
+        tvRoomName.setText(roomName);
 
         database.child("rooms").child(roomId).child("users").addValueEventListener(new ValueEventListener() {
             @Override
@@ -65,7 +72,11 @@ public class RoomActivity extends AppCompatActivity {
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     String uName = (String) ds.child("name").getValue();
                     String uProfile = (String) ds.child("profile").getValue();
-                    list.add(new MyUser(uName, uProfile));
+                    list.add(new UserDto(uName, uProfile));
+                }
+
+                if (list.size() == 0){
+                    database.child("rooms").child(roomId).setValue(null);
                 }
                 userAdapter.notifyDataSetChanged();
             }
@@ -85,7 +96,8 @@ public class RoomActivity extends AppCompatActivity {
                 // 템플릿에 입력된 Argument에 채워질 값
                 Map<String, String> templateArgs = new HashMap<>();
                 templateArgs.put("name", name);
-                templateArgs.put("id", roomId);
+                templateArgs.put("roomId", roomId);
+                templateArgs.put("roomName", roomName);
 
                 // 사용자 정의 메시지로 카카오링크 보내기
                 KakaoLinkService.getInstance()
