@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
@@ -159,7 +158,7 @@ public class IndexActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             String roomId = database.child("users").child(uid).child("rooms").push().getKey();
             String roomName = data.getStringExtra("roomName");
             long timestamp = data.getLongExtra("timestamp", 0);
