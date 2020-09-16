@@ -33,17 +33,23 @@ public class MakeActivity extends AppCompatActivity {
 
         Calendar calendar = Calendar.getInstance();
         y = calendar.get(Calendar.YEAR);
-        m = calendar.get(Calendar.MONTH);
+        m = calendar.get(Calendar.MONTH) + 1;
         d = calendar.get(Calendar.DATE);
         hrs = calendar.get(Calendar.HOUR_OF_DAY);
         min = calendar.get(Calendar.MINUTE);
+
+        etName = findViewById(R.id.etRoomName);
+        tvDate = findViewById(R.id.tvDate);
+        btnMakeRoom = findViewById(R.id.btnMakeRoom);
+        tvDate.setText(y + "년 " + m + "월 " + d + "일 " + hrs + "시 " + min + "분");
 
         onDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 y = year;
-                m = month;
+                m = month + 1;
                 d = dayOfMonth;
+                tvDate.setText(y + "년 " + m + "월 " + d + "일 " + hrs + "시 " + min + "분");
             }
         };
 
@@ -52,12 +58,9 @@ public class MakeActivity extends AppCompatActivity {
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 hrs = hourOfDay;
                 min = minute;
+                tvDate.setText(y + "년 " + m + "월 " + d + "일 " + hrs + "시 " + min + "분");
             }
         };
-
-        etName = findViewById(R.id.etRoomName);
-        tvDate = findViewById(R.id.tvDate);
-        btnMakeRoom = findViewById(R.id.btnMakeRoom);
 
         Intent intent = getIntent();
         etName.setText(intent.getStringExtra("name") + "의 방");

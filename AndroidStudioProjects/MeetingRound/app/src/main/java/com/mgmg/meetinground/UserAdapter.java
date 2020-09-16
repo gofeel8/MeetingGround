@@ -44,9 +44,12 @@ public class UserAdapter extends BaseAdapter {
 
         ImageView ivProfile = view.findViewById(R.id.ivProfile2);
         TextView tvName = view.findViewById(R.id.tvName2);
+        ImageView ivHost = view.findViewById(R.id.ivHost);
 
         Glide.with(context).load(list.get(position).getProfile()).into(ivProfile);
         tvName.setText(list.get(position).getName());
+        if (position == 0)
+            ivHost.setVisibility(View.VISIBLE);
 
         return view;
     }

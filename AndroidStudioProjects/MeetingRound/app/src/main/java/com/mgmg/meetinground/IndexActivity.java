@@ -166,6 +166,7 @@ public class IndexActivity extends AppCompatActivity {
 
             database.child("users").child(uid).child("rooms").child(roomId).setValue(roomName);
             database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
+            database.child("rooms").child(roomId).child("users").child(uid).child("host").setValue(true);
             database.child("rooms").child(roomId).child("settings").child("title").setValue(roomName);
             database.child("rooms").child(roomId).child("settings").child("time").setValue(timestamp);
             enter(roomId, roomName);

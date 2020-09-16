@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,7 +54,11 @@ public class RoomActivity extends AppCompatActivity {
         if (intent.getBooleanExtra("isFirst", false)) {
             database.child("users").child(uid).child("rooms").child(roomId).setValue(roomName);
         }
-        database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("rooms/"+roomId+"/users/"+uid+"/name", name);
+        updates.put("rooms/"+roomId+"/users/"+uid+"/profile", profile);
+        database.updateChildren(updates);
+//        database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
 
         lvUsers = findViewById(R.id.lvUsers);
         tvRoomName = findViewById(R.id.tvRoomName);
@@ -69,14 +74,31 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
+                boolean hasHost = false;
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     String uName = (String) ds.child("name").getValue();
                     String uProfile = (String) ds.child("profile").getValue();
-                    list.add(new UserDto(uName, uProfile));
+                    boolean isHost = false;
+                    if (ds.child("host").getValue() != null)
+                        isHost = true;
+                    if (isHost) {
+                        list.add(0, new UserDto(uName, uProfile));
+                        hasHost = true;
+                    }
+                    else {
+                        list.add(new UserDto(uName, uProfile));
+                    }
                 }
 
-                if (list.size() == 0){
+                if (list.size() == 0 || !hasHost) {
                     database.child("rooms").child(roomId).setValue(null);
+                    if (!hasHost) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            database.child("users").child(ds.getKey()).child("rooms").child(roomId).setValue(null);
+                        }
+                        Toast.makeText(getApplicationContext(), "방장이 방을 나갔습니다.", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
                 }
                 userAdapter.notifyDataSetChanged();
             }
