@@ -35,7 +35,7 @@ public class RoomActivity extends AppCompatActivity {
     List<UserDto> list;
     ListView lvUsers;
     TextView tvRoomName;
-    Button btnSend, btnExit;
+    Button btnSend, btnExit, btnmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,7 @@ public class RoomActivity extends AppCompatActivity {
         tvRoomName = findViewById(R.id.tvRoomName);
         btnSend = findViewById(R.id.btnSend);
         btnExit = findViewById(R.id.btnExit);
+        btnmap=findViewById(R.id.btnmap);
 
         list = new ArrayList<>();
         userAdapter = new UserAdapter(getApplicationContext(), list);
@@ -106,6 +107,14 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        btnmap.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(RoomActivity.this,MapActivity.class);
+                startActivity(intent);
             }
         });
 
