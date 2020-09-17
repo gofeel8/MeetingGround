@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Meeting Round</string>
+    <string name="notification_title">title</string>
+    <string name="notification_message">message</string>
 </resources>

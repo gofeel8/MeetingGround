@@ -3,6 +3,8 @@ package com.mgmg.meetinground;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,9 +24,12 @@ import com.kakao.kakaolink.v2.KakaoLinkService;
 import com.kakao.network.ErrorResult;
 import com.kakao.network.callback.ResponseCallback;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class RoomActivity extends AppCompatActivity {
@@ -36,6 +41,9 @@ public class RoomActivity extends AppCompatActivity {
     ListView lvUsers;
     TextView tvRoomName;
     Button btnSend, btnExit, btnmap;
+
+    Long meetingTime;
+    Calendar calendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +78,52 @@ public class RoomActivity extends AppCompatActivity {
         userAdapter = new UserAdapter(getApplicationContext(), list);
         lvUsers.setAdapter(userAdapter);
         tvRoomName.setText(roomName);
+
+
+         calendar = Calendar.getInstance();
+
+
+        //방에들어오면 알람이 설정된다. 동일한 이름의 PendingIntent는 덮어쓰여지는것으로 알고있음
+        database.child("rooms").child(roomId).child("settings").child("time").addValueEventListener(new ValueEventListener() {
+            final int _id = roomId.hashCode();
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("GPS","진입");
+                meetingTime = (Long) snapshot.getValue();
+                Log.d("GPS",meetingTime.toString());
+                calendar.setTimeInMillis(meetingTime);
+
+
+                if(calendar.before(Calendar.getInstance())){
+                    Toast.makeText(RoomActivity.this, "지난 모임방에들어옴", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //Receiver 설정
+                Intent intent = new Intent(RoomActivity.this,AlarmReceiver.class);
+                intent.putExtra("uid",uid);
+                intent.putExtra("roomId",roomId);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(RoomActivity.this,_id,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+                //.알람 설정
+                AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
+
+                //Toast보여주기(알람 시간 표시)
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                Toast.makeText(RoomActivity.this, "Alarm : "+format.format(calendar.getTime()), Toast.LENGTH_SHORT).show();
+
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         database.child("rooms").child(roomId).child("users").addValueEventListener(new ValueEventListener() {
             @Override
