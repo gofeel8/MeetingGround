@@ -62,6 +62,7 @@
             android:exported="false"/>
 
         <service android:name=".AlarmService"
+            android:foregroundServiceType="location"
             android:enabled="true"/>
 
 
