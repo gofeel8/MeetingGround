@@ -89,8 +89,11 @@ public class RoomActivity extends AppCompatActivity {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 Log.d("GPS","진입");
                 meetingTime = (Long) snapshot.getValue();
+                if(meetingTime !=null){
+
                 Log.d("GPS",meetingTime.toString());
                 calendar.setTimeInMillis(meetingTime);
 
@@ -115,6 +118,7 @@ public class RoomActivity extends AppCompatActivity {
                 Toast.makeText(RoomActivity.this, "Alarm : "+format.format(calendar.getTime()), Toast.LENGTH_SHORT).show();
 
 
+                }
 
 
             }
