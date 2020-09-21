@@ -33,11 +33,7 @@
         <activity
             android:name=".MainActivity"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -47,6 +43,14 @@
                 <data
                     android:host="kakaolink"
                     android:scheme="kakaoc08e3ab1a1c35e58420c4dc648cbeab4" />
+            </intent-filter>
+
+        </activity>
+        <activity android:name=".PermissionRequestActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
         </activity>
