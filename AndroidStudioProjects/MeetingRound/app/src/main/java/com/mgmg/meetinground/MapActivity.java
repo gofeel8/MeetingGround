@@ -27,11 +27,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,10 +43,21 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,6 +69,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private Button button2;
 
+    private String api_key="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ";
+
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -62,7 +78,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     private int circlesize=5000;
     final Handler handler=new Handler();
     Runnable run=null;
-
 
 
     @Override
@@ -75,7 +90,25 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         editText=(EditText)findViewById(R.id.editText);
+
+        Places.initialize(getApplicationContext(),api_key);
+
+        editText.setFocusable(false);
+        editText.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                List<Place.Field> fieldList=Arrays.asList(Place.Field.ADDRESS
+                        ,Place.Field.LAT_LNG,Place.Field.NAME);
+
+                Intent intent=new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY
+                        ,fieldList).build(MapActivity.this);
+                startActivityForResult(intent,100);
+            }
+        });
+
         button2=(Button)findViewById(R.id.button2);
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
@@ -83,6 +116,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             checkRunTimePermission();
         }
         final TextView textview_address = (TextView)findViewById(R.id.textView);
+
 
         button2.setOnClickListener(new Button.OnClickListener(){
             @Override
@@ -118,37 +152,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 alert.create().show();
             }
         });
-
-
-        Button ShowLocationButton = (Button) findViewById(R.id.button);
-        ShowLocationButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View arg0)
-            {
-                AlertDialog.Builder alert = new AlertDialog.Builder(MapActivity.this);
-                alert.setTitle("내 위치");
-                alert.setMessage("내 위치를 출발지점으로 선택하시겠습니까?");
-                alert.setNegativeButton("아니오",null);
-
-                alert.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        gpsTracker = new GpsTracker(MapActivity.this);
-
-                        double latitude = gpsTracker.getLatitude();
-                        double longitude = gpsTracker.getLongitude();
-                        String address = getCurrentAddress(latitude, longitude);
-                        LatLng now=new LatLng(latitude,longitude);
-                        magnetic_field(now);
-                    }
-                });
-                alert.create().show();
-            }
-        });
-
     }
-
 
     /*
      * ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
@@ -327,6 +331,16 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 break;
+            case 100:
+                if(resultCode==RESULT_OK){
+                    Place place= Autocomplete.getPlaceFromIntent(data);
+
+                    editText.setText(place.getAddress());
+                }else if(resultCode== AutocompleteActivity.RESULT_ERROR){
+                    Status status=Autocomplete.getStatusFromIntent(data);
+                    Toast.makeText(getApplicationContext(),status.getStatusMessage()
+                            ,Toast.LENGTH_SHORT).show();
+                }
         }
     }
 
@@ -359,7 +373,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void magnetic_field(final LatLng position){
-        // 여기에 실행 함수.
         handler.removeCallbacks(run);
 
         // textview_address.setText(address);

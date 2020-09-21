@@ -11,31 +11,24 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="내위치" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
         <EditText
             android:id="@+id/editText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Address." />
+            android:hint="Enter Address"
+            android:gravity="center_vertical"
+            android:background="@android:drawable/editbox_background"
+            />
 
         <Button
             android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="찾기" />
+            android:text="선택" />
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -48,5 +41,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".MapsActivity" />
+
     </LinearLayout>
 </LinearLayout>
