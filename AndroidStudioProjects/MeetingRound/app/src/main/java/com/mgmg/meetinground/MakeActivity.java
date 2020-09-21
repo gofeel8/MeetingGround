@@ -69,7 +69,7 @@ public class MakeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Calendar calendar = Calendar.getInstance();
-                calendar.set(y, m, d, hrs, min);
+                calendar.set(y, m, d, hrs, min,0);
 
                 Intent intent = new Intent();
                 intent.putExtra("roomName", etName.getText().toString());
