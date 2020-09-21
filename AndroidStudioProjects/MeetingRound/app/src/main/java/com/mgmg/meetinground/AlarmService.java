@@ -47,10 +47,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class AlarmService extends Service {
+
+    Calendar EndTime;
 
     private static final String PACKAGE_NAME =
             "com.mgmg.meetinground;";
@@ -126,13 +132,21 @@ public class AlarmService extends Service {
 
     @Override
     public void onCreate() {
+        EndTime = Calendar.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mLocationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                onNewLocation(locationResult.getLastLocation());
+
+                if(EndTime.after(Calendar.getInstance())){
+                    onNewLocation(locationResult.getLastLocation());
+                }else{
+                    removeLocationUpdates();
+                    stopSelf();
+                }
+
             }
         };
 
@@ -161,7 +175,22 @@ public class AlarmService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String roomId = intent.getStringExtra("roomId");
         String uid = intent.getStringExtra("uid");
-        userRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId).child("users").child(uid);
+        Long temptime = intent.getLongExtra("meetingTime",0);
+        if(temptime != 0){
+            long finishtime = 0; // 모임시간 finishtime분후 종료
+
+            EndTime.setTimeInMillis(temptime+(finishtime*60*1000));
+
+            //Toast보여주기(알람 시간 표시)
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Log.d("GPS","종료시간 Alarm : "+format.format(EndTime.getTime()));
+
+
+
+        }
+        if(roomId !=null && uid !=null){
+            userRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId).child("users").child(uid);
+        }
 
         Log.i(TAG, "Service started");
         startForeground(NOTIFICATION_ID, getNotification());
@@ -222,6 +251,7 @@ public class AlarmService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "ServiceDestroy");
         mServiceHandler.removeCallbacksAndMessages(null);
     }
 

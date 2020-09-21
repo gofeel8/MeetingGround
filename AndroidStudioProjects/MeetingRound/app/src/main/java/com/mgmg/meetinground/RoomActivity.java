@@ -107,15 +107,21 @@ public class RoomActivity extends AppCompatActivity {
                 Intent intent = new Intent(RoomActivity.this,AlarmReceiver.class);
                 intent.putExtra("uid",uid);
                 intent.putExtra("roomId",roomId);
+                intent.putExtra("meetingTime",meetingTime);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(RoomActivity.this,_id,intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
                 //.알람 설정
+                long startMinutes = 1;
+                Calendar startTime = Calendar.getInstance();
+                startTime.setTimeInMillis(calendar.getTimeInMillis()-(startMinutes*60*1000));
+
+
                 AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-                alarmManager.set(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),pendingIntent);
+                alarmManager.set(AlarmManager.RTC_WAKEUP,startTime.getTimeInMillis(),pendingIntent);
 
                 //Toast보여주기(알람 시간 표시)
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                Toast.makeText(RoomActivity.this, "Alarm : "+format.format(calendar.getTime()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(RoomActivity.this, "Alarm : "+format.format(startTime.getTime()), Toast.LENGTH_SHORT).show();
 
 
                 }
