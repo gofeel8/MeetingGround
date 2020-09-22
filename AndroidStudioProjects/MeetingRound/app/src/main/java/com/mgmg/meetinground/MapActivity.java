@@ -9,8 +9,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
@@ -19,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -34,11 +42,19 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -53,22 +69,31 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.maps.android.SphericalUtil;
+import com.koushikdutta.ion.Ion;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 public class MapActivity  extends AppCompatActivity implements OnMapReadyCallback
 {
     private GpsTracker gpsTracker;
 
+    private String temploc;
     private EditText editText;
     private GoogleMap mMap;
     private Button button2;
-
+    private DatabaseReference database;
     private String api_key="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ";
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -90,6 +115,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        database = FirebaseDatabase.getInstance().getReference();
 
         editText=(EditText)findViewById(R.id.editText);
 
@@ -132,6 +159,10 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String str=editText.getText().toString();
                         List<Address> addresses=null;
+                        Intent intent=getIntent();
+                        String roomId=intent.getStringExtra("roomId");
+
+                        database.child("rooms").child(roomId).child("settings").child("address").setValue(str);
                         Geocoder geocoder=new Geocoder(getBaseContext());
                         try{
                             addresses=geocoder.getFromLocationName(
@@ -139,7 +170,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                                     10);
                             String []splitStr=addresses.get(0).toString().split(",");
                             String address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
-                                    splitStr[0].length()-2); // 주소 parsing.
+                                    splitStr[0].length()-2); // 주소 parsing
                             String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
                             String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
                             final LatLng point = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
@@ -366,10 +397,95 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         markerOptions.position(address);
         markerOptions.title("현위치");
         markerOptions.snippet("now");
+        String url=getIntent().getStringExtra("profile");
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(url)));
+
         mMap.addMarker(markerOptions);
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(address));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+    }
+
+    public Bitmap getBitmapFromLink(String link) {
+        try {
+            URL url = new URL(link);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            try {
+                connection.connect();
+            } catch (Exception e) {
+                Log.v("asfwqeds", e.getMessage());
+            }
+            InputStream input = connection.getInputStream();
+            BitmapFactory.Options options=new BitmapFactory.Options();
+            options.inSampleSize=4;
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            myBitmap=getCircularBitmap(myBitmap);
+            myBitmap=resizeBitmapImage(myBitmap,100);
+            return myBitmap;
+        } catch (IOException e) {
+            Log.v("asfwqeds", e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+    protected Bitmap getCircularBitmap(Bitmap srcBitmap) {
+        // Calculate the circular bitmap width with border
+        int squareBitmapWidth = Math.min(srcBitmap.getWidth(), srcBitmap.getHeight());
+        // Initialize a new instance of Bitmap
+        Bitmap dstBitmap = Bitmap.createBitmap (
+                squareBitmapWidth, // Width
+                squareBitmapWidth, // Height
+                Bitmap.Config.ARGB_8888 // Config
+        );
+        Canvas canvas = new Canvas(dstBitmap);
+        // Initialize a new Paint instance
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        Rect rect = new Rect(0, 0, squareBitmapWidth, squareBitmapWidth);
+        RectF rectF = new RectF(rect);
+        canvas.drawOval(rectF, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        // Calculate the left and top of copied bitmap
+        float left = (squareBitmapWidth-srcBitmap.getWidth())/2;
+        float top = (squareBitmapWidth-srcBitmap.getHeight())/2;
+        canvas.drawBitmap(srcBitmap, left, top, paint);
+        // Free the native object associated with this bitmap.
+        srcBitmap.recycle();
+        // Return the circular bitmap
+        return dstBitmap;
+    }
+    public Bitmap resizeBitmapImage(Bitmap source, int maxResolution)
+    {
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int newWidth = width;
+        int newHeight = height;
+        float rate = 0.0f;
+
+        if(width > height)
+        {
+            if(maxResolution < width)
+            {
+                rate = maxResolution / (float) width;
+                newHeight = (int) (height * rate);
+                newWidth = maxResolution;
+            }
+        }
+        else
+        {
+            if(maxResolution < height)
+            {
+                rate = maxResolution / (float) height;
+                newWidth = (int) (width * rate);
+                newHeight = maxResolution;
+            }
+        }
+
+        return Bitmap.createScaledBitmap(source, newWidth, newHeight, true);
     }
 
     public void magnetic_field(final LatLng position){
