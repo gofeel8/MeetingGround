@@ -6,49 +6,32 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecommendActivity extends AppCompatActivity {
-    LinearLayout llLocation;
-    LinearLayout llMenu;
-    LinearLayout llKeyword;
-    LinearLayout now;
+    List<String> navList, locationList, menuList, keywordList;
+    // resultList 추가해야됨
+
+    StringAdapter navAdapter;
+    ListView lvNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_recommend);
 
-        Button btnLocation = findViewById(R.id.btnLocation);
-        Button btnMenu = findViewById(R.id.btnMenu);
-        Button btnKeyword = findViewById(R.id.btnKeyword);
-        llLocation = findViewById(R.id.llLocation);
-        llMenu = findViewById(R.id.llMenu);
-        llKeyword = findViewById(R.id.llKeyword);
-        now = llLocation;
+        lvNav = findViewById(R.id.lvNav);
 
-        btnLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                now.setVisibility(View.INVISIBLE);
-                now = llLocation;
-                llLocation.setVisibility(View.VISIBLE);
-            }
-        });
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                now.setVisibility(View.INVISIBLE);
-                now = llMenu;
-                llMenu.setVisibility(View.VISIBLE);
-            }
-        });
-        btnKeyword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                now.setVisibility(View.INVISIBLE);
-                now = llKeyword;
-                llKeyword.setVisibility(View.VISIBLE);
-            }
-        });
+        navList = new ArrayList<>();
+        navList.add("지역");
+        navList.add("메뉴");
+        navList.add("키워드");
+        navList.add("투표함");
+
+        navAdapter = new StringAdapter(getApplicationContext(), navList);
+        lvNav.setAdapter(navAdapter);
     }
 }

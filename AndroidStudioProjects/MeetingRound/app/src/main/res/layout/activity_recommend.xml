@@ -5,71 +5,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RecommendActivity">
+
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
-        android:background="#969696"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            android:layout_weight="1"
-            android:background="#FFFFFF"
-            android:text="지역" />
-
-        <Button
-            android:id="@+id/btnMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            android:layout_weight="1"
-            android:background="#FFFFFF"
-            android:text="메뉴" />
-
-        <Button
-            android:id="@+id/btnKeyword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            android:layout_weight="1"
-            android:background="#FFFFFF"
-            android:text="키워드" />
-
-        <Button
-            android:id="@+id/btnVote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="1dp"
-            android:layout_weight="1"
-            android:background="#FFFFFF"
-            android:text="투표함" />
+        <ListView
+            android:id="@+id/lvNav"
+            android:layout_width="60dp"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
     <FrameLayout
-        android:layout_width="match_parent"
+        android:layout_width="100dp"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/llLocation"
-            android:layout_width="match_parent"
+        <ListView
+            android:id="@+id/lvLoc"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"/>
+            android:visibility="visible" />
 
-        <LinearLayout
-            android:id="@+id/llMenu"
-            android:layout_width="match_parent"
+        <ListView
+            android:id="@+id/lvMenu"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
 
-        <LinearLayout
-            android:id="@+id/llKeyword"
-            android:layout_width="match_parent"
+        <ListView
+            android:id="@+id/lvKey"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:visibility="invisible"></LinearLayout>
+            android:visibility="invisible" />
+
+        <ListView
+            android:id="@+id/lvVote"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
     </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </ListView>
+    </LinearLayout>
 </LinearLayout>
