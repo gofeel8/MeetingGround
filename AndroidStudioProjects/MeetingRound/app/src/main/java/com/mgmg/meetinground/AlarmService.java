@@ -177,7 +177,7 @@ public class AlarmService extends Service {
         String uid = intent.getStringExtra("uid");
         Long temptime = intent.getLongExtra("meetingTime",0);
         if(temptime != 0){
-            long finishtime = 0; // 모임시간 finishtime분후 종료
+            long finishtime = 1; // 모임시간 finishtime분후 종료
 
             EndTime.setTimeInMillis(temptime+(finishtime*60*1000));
 
