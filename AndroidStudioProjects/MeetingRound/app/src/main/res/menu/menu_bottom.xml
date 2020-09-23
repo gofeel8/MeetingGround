@@ -5,7 +5,7 @@
         android:id="@+id/tab1"
         app:showAsAction="ifRoom"
         android:enabled="true"
-        android:icon="@android:drawable/ic_dialog_info"
+        android:icon="@drawable/lobby"
         android:title="대기실"/>
     <item
         android:id="@+id/tab2"
@@ -17,7 +17,7 @@
         android:id="@+id/tab3"
         app:showAsAction="ifRoom"
         android:enabled="true"
-        android:icon="@android:drawable/ic_dialog_dialer"
+        android:icon="@drawable/recommend"
         android:title="맛집추천"/>
 
 
