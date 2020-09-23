@@ -4,5 +4,5 @@
     android:id="@+id/shape_my">
 
     <corners android:radius="40dp" />
-    <solid android:color="#f7e305" />
+    <solid android:color="@color/colorMyTheme" />
 </shape>
