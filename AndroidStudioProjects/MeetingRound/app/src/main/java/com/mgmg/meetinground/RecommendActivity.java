@@ -1,14 +1,19 @@
 package com.mgmg.meetinground;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -118,6 +123,47 @@ public class RecommendActivity extends AppCompatActivity {
         locList.add("경상북도");
         locList.add("경상남도");
         locList.add("제주특별자치도");
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setSelectedItemId(R.id.tab3);
+        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
+                Intent intent = getIntent();
+                switch (item.getItemId()){
+
+                    case R.id.tab1:
+                        intent = getIntent();
+                        Intent intent2=new Intent(getApplicationContext(),RoomActivity.class);
+                        intent2.putExtras(intent);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent2);
+                        return true;
+                    case R.id.tab2:
+                        intent = getIntent();
+                        Intent intent3=new Intent(getApplicationContext(),MapActivity.class);
+                        intent3.putExtras(intent);
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent3);
+                        return true;
+                    case R.id.tab3:
+                        return true;
+
+                }
+                return false;
+            }
+        });
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setSelectedItemId(R.id.tab3);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(0, 0);
     }
 }

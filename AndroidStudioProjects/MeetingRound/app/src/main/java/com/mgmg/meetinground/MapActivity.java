@@ -160,7 +160,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) { // 위치정보가 받아지기 시작했을때
                 // 1. 모임장소를 띄운다. + 자기장
-                System.out.println(database.child("rooms").child(roomId).child("settings").child("address").g);
+//                System.out.println(database.child("rooms").child(roomId).child("settings").child("address").g);
                 // 2. 각자의 위치를 띄운다.
 
                 // 3. 게임시작이 되면 -> 본인이 자기장 밖에 있으면 알림+벌금적용.
@@ -228,13 +228,23 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.tab1:
-                        final Intent intent = getIntent();
+                        Intent intent = getIntent();
                         Intent intent2=new Intent(MapActivity.this,RoomActivity.class);
                         intent2.putExtras(intent);
                         intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent2);
                         return true;
                     case R.id.tab2:
+                        return true;
+                    case R.id.tab3:
+                        intent = getIntent();
+                        Intent intent3 = new Intent(getApplicationContext(), RecommendActivity.class);
+                        intent3.putExtras(intent);
+
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                        startActivity(intent3);
+
                         return true;
 
                 }
@@ -243,6 +253,12 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setSelectedItemId(R.id.tab2);
+    }
     /*
      * ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
      */
