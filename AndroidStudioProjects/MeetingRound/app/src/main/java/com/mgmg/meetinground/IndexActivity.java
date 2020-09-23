@@ -27,6 +27,8 @@ import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -98,15 +100,31 @@ public class IndexActivity extends AppCompatActivity {
                         String date;
                         calendar = Calendar.getInstance();
                         calendar.setTimeInMillis((Long) snapshot.getValue());
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd", Locale.getDefault());
-                        SimpleDateFormat timeFormat = new SimpleDateFormat(" HH:mm", Locale.getDefault());
-                        date=dateFormat.format(calendar.getTime());
-                        time=timeFormat.format(calendar.getTime());
-                        Log.d("GPS","모임날짜  : "+date);
-                        Log.d("GPS","모임시간  : "+time);
-                        list.add(new RoomDto(roomId, roomName,date,time));
+                        list.add(new RoomDto(roomId, roomName,calendar));
+//                        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd", Locale.getDefault());
+//                        SimpleDateFormat timeFormat = new SimpleDateFormat(" HH:mm", Locale.getDefault());
+//                        date=dateFormat.format(calendar.getTime());
+//                        time=timeFormat.format(calendar.getTime());
+//                        Log.d("GPS","모임날짜  : "+date);
+//                        Log.d("GPS","모임시간  : "+time);
+//
+//                        list.add(new RoomDto(roomId, roomName,date,time));
 
 
+                        Comparator<RoomDto> comp = new Comparator<RoomDto>() {
+                            @Override
+                            public int compare(RoomDto o1, RoomDto o2) {
+                                int rt = 0;
+                                if (o1.getCalendar().before(o2.getCalendar()))
+                                    rt = 1 ;
+                                else
+                                    rt = -1 ;
+
+                                return rt ;
+                            }
+                        };
+
+                        Collections.sort(list, comp) ;
                         roomAdapter.notifyDataSetChanged();
                     }
 
@@ -138,6 +156,20 @@ public class IndexActivity extends AppCompatActivity {
                         list.remove(i);
                     }
                 }
+                Comparator<RoomDto> comp = new Comparator<RoomDto>() {
+                    @Override
+                    public int compare(RoomDto o1, RoomDto o2) {
+                        int rt = 0;
+                        if (o1.getCalendar().before(o2.getCalendar()))
+                            rt = 1 ;
+                        else
+                            rt = -1 ;
+
+                        return rt ;
+                    }
+                };
+
+                Collections.sort(list, comp) ;
                 roomAdapter.notifyDataSetChanged();
             }
 
