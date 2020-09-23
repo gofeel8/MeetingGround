@@ -180,7 +180,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         }else {
             checkRunTimePermission();
         }
-        final TextView textview_address = (TextView)findViewById(R.id.textView);
+//        final TextView textview_address = (TextView)findViewById(R.id.textView);
 
 
         button2.setOnClickListener(new Button.OnClickListener(){
