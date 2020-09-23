@@ -28,12 +28,15 @@ public class RecommendActivity extends AppCompatActivity {
     ListView[] listViews;
     FrameLayout flNav;
     HashSet<String> navSet, locSet;
-    int idx;
+    int height, divider, width, idx;
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        final int height = lvNav.getHeight(), divider = lvNav.getDividerHeight(), width = flNav.getWidth();
+        height = lvNav.getHeight();
+        divider = lvNav.getDividerHeight();
+        width = 315;
+        idx = -1;
 
         navAdapter = new StringAdapter(getApplicationContext(), navList, height, divider, navSet);
         locAdapter = new StringAdapter(getApplicationContext(), locList, height, divider, locSet);
@@ -47,17 +50,30 @@ public class RecommendActivity extends AppCompatActivity {
         lvNav.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                listViews[idx].setVisibility(View.INVISIBLE);
-                listViews[position].setVisibility(View.VISIBLE);
-                idx = position;
-                if (idx == 3) {
-                    flNav.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                if (position == idx) {
+                    listViews[idx].setVisibility(View.INVISIBLE);
+                    idx = -1;
+                    flNav.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT));
+                    navSet.clear();
+                    navAdapter.notifyDataSetChanged();
+
                 } else {
-                    flNav.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
+                    if (idx != -1) {
+                        listViews[idx].setVisibility(View.INVISIBLE);
+                    }
+                    listViews[position].setVisibility(View.VISIBLE);
+                    idx = position;
+
+                    if (idx == 3) {
+                        flNav.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                    } else {
+                        flNav.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
+                    }
+
+                    navSet.clear();
+                    navSet.add(navList.get(position));
+                    navAdapter.notifyDataSetChanged();
                 }
-                navSet.clear();
-                navSet.add(navList.get(position));
-                navAdapter.notifyDataSetChanged();
             }
         });
 
@@ -95,8 +111,6 @@ public class RecommendActivity extends AppCompatActivity {
         lvResult = findViewById(R.id.lvResult);
 
         navSet = new HashSet<>();
-        navSet.add("지역");
-
         locSet = new HashSet<>();
 
         navList = new ArrayList<>();
@@ -123,15 +137,14 @@ public class RecommendActivity extends AppCompatActivity {
         locList.add("경상북도");
         locList.add("경상남도");
         locList.add("제주특별자치도");
+
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setSelectedItemId(R.id.tab3);
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
                 Intent intent = getIntent();
                 switch (item.getItemId()){
-
                     case R.id.tab1:
                         intent = getIntent();
                         Intent intent2=new Intent(getApplicationContext(),RoomActivity.class);
@@ -148,7 +161,6 @@ public class RecommendActivity extends AppCompatActivity {
                         return true;
                     case R.id.tab3:
                         return true;
-
                 }
                 return false;
             }
