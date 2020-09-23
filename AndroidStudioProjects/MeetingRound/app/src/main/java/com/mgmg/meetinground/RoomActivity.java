@@ -261,6 +261,15 @@ public class RoomActivity extends AppCompatActivity {
                         startActivity(intent2);
 
                         return true;
+                    case R.id.tab3:
+                        Intent intent3 = new Intent(RoomActivity.this, RecommendActivity.class);
+
+                        intent3.putExtras(intent);
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                        startActivity(intent3);
+
+                        return true;
 
                 }
                 return false;
@@ -268,5 +277,12 @@ public class RoomActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setSelectedItemId(R.id.tab1);
     }
 }
