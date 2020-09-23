@@ -41,8 +41,8 @@ public class RoomActivity extends AppCompatActivity {
     UserAdapter userAdapter;
     List<UserDto> list;
     ListView lvUsers;
-    TextView tvRoomName;
-    Button btnSend, btnExit, btnmap, btnRecommend;
+    TextView tvRoomName,tvRoomTime;
+    Button btnSend, btnExit, btnBack,btnmap, btnRecommend;
 
     Long meetingTime;
     Calendar calendar;
@@ -65,6 +65,7 @@ public class RoomActivity extends AppCompatActivity {
         roomId = intent.getStringExtra("roomId");
         roomName = intent.getStringExtra("roomName");
 
+
         database = FirebaseDatabase.getInstance().getReference();
 
         if (intent.getBooleanExtra("isFirst", false)) {
@@ -77,8 +78,11 @@ public class RoomActivity extends AppCompatActivity {
 
         lvUsers = findViewById(R.id.lvUsers);
         tvRoomName = findViewById(R.id.tvRoomName);
+        tvRoomTime = findViewById(R.id.tvRoomTime);
+
         btnSend = findViewById(R.id.btnSend);
         btnExit = findViewById(R.id.btnExit);
+        btnBack = findViewById(R.id.btnBack);
 //        btnmap=findViewById(R.id.btnmap);
 //        btnRecommend = findViewById(R.id.btnRecommend);
 
@@ -105,6 +109,8 @@ public class RoomActivity extends AppCompatActivity {
                 Log.d("GPS",meetingTime.toString());
                 calendar.setTimeInMillis(meetingTime);
 
+                SimpleDateFormat format = new SimpleDateFormat("MM월dd일 HH시mm분", Locale.getDefault());
+                tvRoomTime.setText(format.format(calendar.getTime()));
 
                 if(calendar.before(Calendar.getInstance())){
                     Toast.makeText(RoomActivity.this, "지난 모임방에들어옴", Toast.LENGTH_SHORT).show();
@@ -128,7 +134,6 @@ public class RoomActivity extends AppCompatActivity {
                 alarmManager.set(AlarmManager.RTC_WAKEUP,startTime.getTimeInMillis(),pendingIntent);
 
                 //Toast보여주기(알람 시간 표시)
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 Toast.makeText(RoomActivity.this, "Alarm : "+format.format(startTime.getTime()), Toast.LENGTH_SHORT).show();
 
 
@@ -239,6 +244,13 @@ public class RoomActivity extends AppCompatActivity {
             public void onClick(View v) {
                 database.child("users").child(uid).child("rooms").child(roomId).setValue(null);
                 database.child("rooms").child(roomId).child("users").child(uid).setValue(null);
+                finish();
+            }
+        });
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 finish();
             }
         });
