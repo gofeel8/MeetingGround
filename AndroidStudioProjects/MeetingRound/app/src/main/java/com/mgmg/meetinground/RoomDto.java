@@ -25,6 +25,16 @@ public class RoomDto {
 
     public RoomDto() {}
 
+    public RoomDto(String roomId, String roomName, Calendar calendar) {
+        this.roomId = roomId;
+        this.roomName = roomName;
+        this.calendar = calendar;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat(" HH:mm", Locale.getDefault());
+        this.date=dateFormat.format(calendar.getTime());
+        this.time=timeFormat.format(calendar.getTime());
+    }
+
     public RoomDto(String roomId, String roomName, String date, String time) {
         this.roomId = roomId;
         this.roomName = roomName;
