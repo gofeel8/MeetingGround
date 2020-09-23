@@ -8,12 +8,14 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,11 +48,17 @@ public class RoomActivity extends AppCompatActivity {
     Calendar calendar;
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room);
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         profile = intent.getStringExtra("profile");
         name = intent.getStringExtra("name");
@@ -222,5 +230,31 @@ public class RoomActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setSelectedItemId(R.id.tab1);
+        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.tab1:
+                        return true;
+                    case R.id.tab2:
+                        Intent intent2=new Intent(RoomActivity.this,MapActivity.class);
+                        intent2.putExtras(intent);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                        startActivity(intent2);
+
+                        return true;
+
+                }
+                return false;
+            }
+        });
+
+
     }
 }

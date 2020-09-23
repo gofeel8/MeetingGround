@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -53,6 +54,7 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
@@ -80,6 +82,11 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     Runnable run=null;
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(0, 0);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -150,6 +157,26 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
                 alert.create().show();
+            }
+        });
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setSelectedItemId(R.id.tab2);
+        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.tab1:
+                        final Intent intent = getIntent();
+                        Intent intent2=new Intent(MapActivity.this,RoomActivity.class);
+                        intent2.putExtras(intent);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent2);
+                        return true;
+                    case R.id.tab2:
+                        return true;
+
+                }
+                return false;
             }
         });
     }
