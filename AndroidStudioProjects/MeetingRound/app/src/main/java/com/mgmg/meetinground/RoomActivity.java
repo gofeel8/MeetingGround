@@ -79,8 +79,8 @@ public class RoomActivity extends AppCompatActivity {
         tvRoomName = findViewById(R.id.tvRoomName);
         btnSend = findViewById(R.id.btnSend);
         btnExit = findViewById(R.id.btnExit);
-        btnmap=findViewById(R.id.btnmap);
-        btnRecommend = findViewById(R.id.btnRecommend);
+//        btnmap=findViewById(R.id.btnmap);
+//        btnRecommend = findViewById(R.id.btnRecommend);
 
         list = new ArrayList<>();
         userAdapter = new UserAdapter(getApplicationContext(), list);
@@ -182,25 +182,25 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        btnRecommend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), RecommendActivity.class);
-                startActivity(intent);
-            }
-        });
+//        btnRecommend.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getApplicationContext(), RecommendActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
-        btnmap.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(RoomActivity.this,MapActivity.class);
-                intent.putExtra("name",name);
-                intent.putExtra("profile",profile);
-                intent.putExtra("roomId",roomId);
-                intent.putExtra("roomName",roomName);
-                startActivity(intent);
-            }
-        });
+//        btnmap.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent=new Intent(RoomActivity.this,MapActivity.class);
+//                intent.putExtra("name",name);
+//                intent.putExtra("profile",profile);
+//                intent.putExtra("roomId",roomId);
+//                intent.putExtra("roomName",roomName);
+//                startActivity(intent);
+//            }
+//        });
 
         btnSend.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -254,8 +254,13 @@ public class RoomActivity extends AppCompatActivity {
                     case R.id.tab1:
                         return true;
                     case R.id.tab2:
+
                         Intent intent2=new Intent(RoomActivity.this,MapActivity.class);
                         intent2.putExtras(intent);
+                        intent2.putExtra("name",name);
+                        intent2.putExtra("profile",profile);
+                        intent2.putExtra("roomId",roomId);
+                        intent2.putExtra("roomName",roomName);
                         intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                         startActivity(intent2);
