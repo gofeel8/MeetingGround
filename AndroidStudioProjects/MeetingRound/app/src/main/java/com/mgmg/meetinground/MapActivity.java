@@ -1,6 +1,7 @@
 package com.mgmg.meetinground;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -71,8 +72,11 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.koushikdutta.ion.Ion;
 
@@ -81,8 +85,10 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -91,11 +97,12 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 {
     private GpsTracker gpsTracker;
 
-    private String temploc;
+    private String temploc,roomId,uid;
     private EditText editText;
     private GoogleMap mMap;
     private Button button2;
     private DatabaseReference database;
+    private Long meetingTime;
     private String api_key="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ";
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -123,6 +130,11 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
 
 
+        Intent intent=getIntent();
+        roomId=intent.getStringExtra("roomId");
+        uid=intent.getStringExtra("uid");
+        meetingTime=intent.getLongExtra("meetingTime",0);
+
         database = FirebaseDatabase.getInstance().getReference();
 
         editText=(EditText)findViewById(R.id.editText);
@@ -142,6 +154,25 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 startActivityForResult(intent,100);
             }
         });
+        database.child("rooms").child(roomId).child("users").child(uid).addValueEventListener(new ValueEventListener() {
+            final int _id = roomId.hashCode();
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) { // 위치정보가 받아지기 시작했을때
+                // 1. 모임장소를 띄운다. + 자기장
+                System.out.println(database.child("rooms").child(roomId).child("settings").child("address").g);
+                // 2. 각자의 위치를 띄운다.
+
+                // 3. 게임시작이 되면 -> 본인이 자기장 밖에 있으면 알림+벌금적용.
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
 
         button2=(Button)findViewById(R.id.button2);
         if (!checkLocationServicesStatus()) {
