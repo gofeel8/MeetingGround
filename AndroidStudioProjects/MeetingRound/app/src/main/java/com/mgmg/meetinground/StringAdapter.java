@@ -13,11 +13,14 @@ public class StringAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
     private List<String> list;
+    private int height, divider;
 
-    public StringAdapter(Context context, List<String> list) {
+    public StringAdapter(Context context, List<String> list, int height, int divider) {
         this.context = context;
         this.list = list;
         this.layoutInflater = LayoutInflater.from(context);
+        this.height = height;
+        this.divider = divider;
     }
 
     @Override
@@ -41,6 +44,7 @@ public class StringAdapter extends BaseAdapter {
 
         TextView tvString = view.findViewById(R.id.tvString);
         tvString.setText(list.get(position));
+        tvString.setHeight(height / list.size() - divider);
 
         return view;
     }
