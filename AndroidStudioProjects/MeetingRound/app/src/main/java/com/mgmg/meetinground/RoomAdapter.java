@@ -41,7 +41,10 @@ public class RoomAdapter extends BaseAdapter {
 
         TextView tvRoomId = view.findViewById(R.id.tvRoomId);
         tvRoomId.setText(list.get(position).getRoomName());
-
+        TextView tvDate = view.findViewById(R.id.tvDate);
+        tvDate.setText(list.get(position).getDate());
+        TextView tvTime = view.findViewById(R.id.tvTime);
+        tvTime.setText(list.get(position).getTime());
         return view;
     }
 }
