@@ -11,14 +11,18 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class RecommendActivity extends AppCompatActivity {
     List<String> navList, locList, menuList, keyList, voteList;
+//    List<String> resultList;
     StringAdapter navAdapter, locAdapter;
-    ListView lvNav, lvLoc, lvMenu, lvKey, lvVote;
+//    StringAdapter resultAdapter;
+    ListView lvNav, lvLoc, lvMenu, lvKey, lvVote, lvResult;
     ListView[] listViews;
     FrameLayout flNav;
+    HashSet<String> navSet, locSet;
     int idx;
 
     @Override
@@ -26,11 +30,12 @@ public class RecommendActivity extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
         final int height = lvNav.getHeight(), divider = lvNav.getDividerHeight(), width = flNav.getWidth();
 
-        navAdapter = new StringAdapter(getApplicationContext(), navList, height, divider);
-        locAdapter = new StringAdapter(getApplicationContext(), locList, height, divider);
+        navAdapter = new StringAdapter(getApplicationContext(), navList, height, divider, navSet);
+        locAdapter = new StringAdapter(getApplicationContext(), locList, height, divider, locSet);
 
         lvNav.setAdapter(navAdapter);
         lvLoc.setAdapter(locAdapter);
+
 
 
 
@@ -45,6 +50,22 @@ public class RecommendActivity extends AppCompatActivity {
                 } else {
                     flNav.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
                 }
+                navSet.clear();
+                navSet.add(navList.get(position));
+                navAdapter.notifyDataSetChanged();
+            }
+        });
+
+        lvLoc.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = locList.get(position);
+                if (locSet.contains(item)) {
+                    locSet.remove(item);
+                } else {
+                    locSet.add(item);
+                }
+                locAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -66,6 +87,12 @@ public class RecommendActivity extends AppCompatActivity {
         listViews[3] = lvVote;
 
         flNav = findViewById(R.id.flNav);
+        lvResult = findViewById(R.id.lvResult);
+
+        navSet = new HashSet<>();
+        navSet.add("지역");
+
+        locSet = new HashSet<>();
 
         navList = new ArrayList<>();
         navList.add("지역");
@@ -91,7 +118,6 @@ public class RecommendActivity extends AppCompatActivity {
         locList.add("경상북도");
         locList.add("경상남도");
         locList.add("제주특별자치도");
-
 
     }
 }

@@ -1,12 +1,14 @@
 package com.mgmg.meetinground;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.HashSet;
 import java.util.List;
 
 public class StringAdapter extends BaseAdapter {
@@ -14,13 +16,15 @@ public class StringAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private List<String> list;
     private int height, divider;
+    private HashSet<String> set;
 
-    public StringAdapter(Context context, List<String> list, int height, int divider) {
+    public StringAdapter(Context context, List<String> list, int height, int divider, HashSet<String> set) {
         this.context = context;
         this.list = list;
         this.layoutInflater = LayoutInflater.from(context);
         this.height = height;
         this.divider = divider;
+        this.set = set;
     }
 
     @Override
@@ -45,6 +49,10 @@ public class StringAdapter extends BaseAdapter {
         TextView tvString = view.findViewById(R.id.tvString);
         tvString.setText(list.get(position));
         tvString.setHeight(height / list.size() - divider);
+
+        if (set.contains(list.get(position))) {
+            tvString.setTextColor(Color.BLUE);
+        }
 
         return view;
     }

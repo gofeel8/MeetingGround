@@ -66,7 +66,6 @@ public class RoomActivity extends AppCompatActivity {
         updates.put("rooms/"+roomId+"/users/"+uid+"/name", name);
         updates.put("rooms/"+roomId+"/users/"+uid+"/profile", profile);
         database.updateChildren(updates);
-//        database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
 
         lvUsers = findViewById(R.id.lvUsers);
         tvRoomName = findViewById(R.id.tvRoomName);
