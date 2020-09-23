@@ -42,7 +42,7 @@ public class RoomActivity extends AppCompatActivity {
     List<UserDto> list;
     ListView lvUsers;
     TextView tvRoomName;
-    Button btnSend, btnExit, btnmap;
+    Button btnSend, btnExit, btnmap, btnRecommend;
 
     Long meetingTime;
     Calendar calendar;
@@ -74,13 +74,13 @@ public class RoomActivity extends AppCompatActivity {
         updates.put("rooms/"+roomId+"/users/"+uid+"/name", name);
         updates.put("rooms/"+roomId+"/users/"+uid+"/profile", profile);
         database.updateChildren(updates);
-//        database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
 
         lvUsers = findViewById(R.id.lvUsers);
         tvRoomName = findViewById(R.id.tvRoomName);
         btnSend = findViewById(R.id.btnSend);
         btnExit = findViewById(R.id.btnExit);
         btnmap=findViewById(R.id.btnmap);
+        btnRecommend = findViewById(R.id.btnRecommend);
 
         list = new ArrayList<>();
         userAdapter = new UserAdapter(getApplicationContext(), list);
@@ -179,6 +179,14 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        btnRecommend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), RecommendActivity.class);
+                startActivity(intent);
             }
         });
 
