@@ -186,6 +186,10 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(RoomActivity.this,MapActivity.class);
+                intent.putExtra("name",name);
+                intent.putExtra("profile",profile);
+                intent.putExtra("roomId",roomId);
+                intent.putExtra("roomName",roomName);
                 startActivity(intent);
             }
         });
