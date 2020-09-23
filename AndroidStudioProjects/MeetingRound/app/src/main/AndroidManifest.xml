@@ -27,15 +27,20 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ"/>
-        <activity android:name=".RecommendActivity"></activity>
-        <activity android:name=".MakeActivity"></activity>
-        <activity android:name=".RoomActivity" />
-        <activity android:name=".IndexActivity" />
-        <activity android:name=".MapActivity"/>
+        <activity android:name=".RecommendActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".MakeActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".RoomActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".IndexActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MapActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
             android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
-
+            android:screenOrientation="portrait"
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -48,7 +53,8 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".PermissionRequestActivity">
+        <activity android:name=".PermissionRequestActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
