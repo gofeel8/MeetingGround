@@ -625,7 +625,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                     Uri defaultSoundUri= RingtoneManager.getDefaultUri((RingtoneManager.TYPE_NOTIFICATION));
                     builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),android.R.drawable.ic_dialog_info))
-                            .setSmallIcon(R.mipmap.ic_logo)
+                            .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle("MGMG")
                             .setContentText("벌금이 부과됩니다.")
                             .setAutoCancel(true)
