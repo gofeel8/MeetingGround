@@ -19,6 +19,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
@@ -478,12 +479,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
-    public static Bitmap loadSameple(String imgPath){
-        BitmapFactory.Options options=new BitmapFactory.Options();
-        options.inPreferredConfig= Bitmap.Config.RGB_565;
-        options.inJustDecodeBounds=true;
-        return BitmapFactory.decodeFile(imgPath,options);
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -499,25 +494,24 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                     gpsTracker = new GpsTracker(MapActivity.this);
                     String myurl=getIntent().getStringExtra("profile");
+
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+                    markerOptions.position(mine);
+                    markerOptions.title("mine");
                     if(!myurl.equals("")) {
                         if (android.os.Build.VERSION.SDK_INT > 9) {
                             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                             StrictMode.setThreadPolicy(policy);
                         }
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
-                        markerOptions.position(mine);
-                        markerOptions.title("mine");
                         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
-                        mMap.addMarker(markerOptions);
                     }else{
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
-                        markerOptions.position(mine);
-                        markerOptions.title("mine");
-                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(loadSameple(Uri.parse("android.resource://"+R.class.getPackage().getName()+"/"+R.drawable.logo).toString()))));
-                        mMap.addMarker(markerOptions);
+                        BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
+                        Bitmap b=bitmapDrawable.getBitmap();
+                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
                     }
+                    mMap.addMarker(markerOptions);
                     // marker title
                     MarkerOptions markerOptions1=new MarkerOptions();
                     markerOptions1.title("click");
@@ -647,15 +641,22 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 // 현재 위치와 비교를 위한 현재 gps 찾기.
                 // 멤버들 위치 보기.
                 String myurl=getIntent().getStringExtra("profile");
-                if (android.os.Build.VERSION.SDK_INT > 9) {
-                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                    StrictMode.setThreadPolicy(policy);
-                }
-                MarkerOptions markerOptions=new MarkerOptions();
-                LatLng mine=(new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude()));
+                MarkerOptions markerOptions = new MarkerOptions();
+                LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
                 markerOptions.position(mine);
                 markerOptions.title("mine");
-                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                if(!myurl.equals("")) {
+                    if (android.os.Build.VERSION.SDK_INT > 9) {
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
+                    }
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                }else{
+                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
+                    Bitmap b=bitmapDrawable.getBitmap();
+                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
+                }
                 mMap.addMarker(markerOptions);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(mine));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
