@@ -674,15 +674,23 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 for(int i=0;i<users.size();i++){
                     String url=profile.get(i);
-                    if(url==myurl)
+                    if(users.get(i)==mine)
                         continue;
                     markerOptions.position(users.get(i));
                     markerOptions.title(name.get(i));
-                    if (android.os.Build.VERSION.SDK_INT > 9) {
-                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                        StrictMode.setThreadPolicy(policy);
+
+                    if(!url.equals("")) {
+                        if (android.os.Build.VERSION.SDK_INT > 9) {
+                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                            StrictMode.setThreadPolicy(policy);
+                        }
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                    }else{
+                        BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
+                        Bitmap b=bitmapDrawable.getBitmap();
+                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
                     }
-                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(url)));
                     mMap.addMarker(markerOptions);
                 }
                 LatLng now=new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
@@ -707,7 +715,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
                     NotificationCompat.Builder builder=null;
 
-                    Investment+=500;
+                    Investment+=100;
                     database.child("rooms").child(roomId).child("investment").child(uid).setValue(Investment);
 
 
