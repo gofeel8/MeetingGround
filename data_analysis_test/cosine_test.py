@@ -42,13 +42,13 @@ def main():
     #     with open('./data.json', encoding="utf-8") as f:
     #         data = json.loads(f.read())
     # except FileNotFoundError:
-    #     print(f"ê° ì¡´ì¬íì§ ììµëë¤.")
+    #     print(f"가 존재하지 않습니다.")
     #     exit(1)
     # try:
     #     with open('./keyword.json', encoding="utf-8-sig") as f1:
     #         tags = json.loads(f1.read())
     # except FileNotFoundError:
-    #     print(f"ê° ì¡´ì¬íì§ ììµëë¤.")
+    #     print(f"가 존재하지 않습니다.")
     #     exit(1)
     # #cnt=0  
     # for d in data:
@@ -108,7 +108,7 @@ def insertAll():
         with open('./data.json', encoding="utf-8") as f:
             data = json.loads(f.read())
     except FileNotFoundError:
-        print(f"ê° ì¡´ì¬íì§ ììµëë¤.")
+        print(f"가 존재하지 않습니다.")
         exit(1)
     #cnt=0
     for d in data:
