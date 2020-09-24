@@ -193,7 +193,7 @@ public class AlarmService extends Service {
 
         }
         if(roomId !=null && uid !=null){
-            userRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId).child("users").child(uid);
+            userRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId).child("info").child("users").child(uid);
 
         }
 

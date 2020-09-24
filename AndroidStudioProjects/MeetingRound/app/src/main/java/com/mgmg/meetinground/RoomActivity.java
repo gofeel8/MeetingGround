@@ -72,8 +72,8 @@ public class RoomActivity extends AppCompatActivity {
             database.child("users").child(uid).child("rooms").child(roomId).setValue(roomName);
         }
         Map<String, Object> updates = new HashMap<>();
-        updates.put("rooms/"+roomId+"/users/"+uid+"/name", name);
-        updates.put("rooms/"+roomId+"/users/"+uid+"/profile", profile);
+        updates.put("rooms/"+roomId+"/info/users/"+uid+"/name", name);
+        updates.put("rooms/"+roomId+"/info/users/"+uid+"/profile", profile);
         database.updateChildren(updates);
 
         lvUsers = findViewById(R.id.lvUsers);
@@ -96,7 +96,7 @@ public class RoomActivity extends AppCompatActivity {
 
 
         //방에들어오면 알람이 설정된다. 동일한 이름의 PendingIntent는 덮어쓰여지는것으로 알고있음
-        database.child("rooms").child(roomId).child("settings").child("time").addValueEventListener(new ValueEventListener() {
+        database.child("rooms").child(roomId).child("info").child("settings").child("time").addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
 
             @Override
@@ -149,7 +149,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        database.child("rooms").child(roomId).child("users").addValueEventListener(new ValueEventListener() {
+        database.child("rooms").child(roomId).child("info").child("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
@@ -244,7 +244,7 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 database.child("users").child(uid).child("rooms").child(roomId).setValue(null);
-                database.child("rooms").child(roomId).child("users").child(uid).setValue(null);
+                database.child("rooms").child(roomId).child("info").child("users").child(uid).setValue(null);
                 finish();
             }
         });
