@@ -101,6 +101,9 @@ public class MainActivity extends Activity {
         @Override
         public void onSessionOpenFailed(KakaoException exception) {
             Log.e("KAKAO_SESSION", "로그인 실패", exception);
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
         }
     };
 

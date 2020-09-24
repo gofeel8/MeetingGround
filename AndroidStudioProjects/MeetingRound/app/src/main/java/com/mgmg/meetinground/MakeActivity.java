@@ -4,9 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -64,6 +66,9 @@ public class MakeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         etName.setText(intent.getStringExtra("name") + "의 모임");
+        etName.requestFocus();
+
+
 
         btnMakeRoom.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,11 +86,10 @@ public class MakeActivity extends AppCompatActivity {
     }
 
     public void setDate(View view) {
-        new DatePickerDialog(this, onDateSetListener, y, m, d).show();
+        new DatePickerDialog(this, R.style.DialogTheme,onDateSetListener, y, m, d).show();
     }
 
     public void setTime(View view) {
-        System.out.println("setTime");
-        new TimePickerDialog(this, onTimeSetListener, hrs, min, true).show();
+        new TimePickerDialog(this,R.style.DialogTheme, onTimeSetListener, hrs, min, true).show();
     }
 }

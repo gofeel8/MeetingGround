@@ -160,7 +160,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 startActivityForResult(intent,100);
             }
         });
-        database.child("rooms").child(roomId).addValueEventListener(new ValueEventListener() {
+        database.child("rooms").child(roomId).child("info").addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
 
 
@@ -241,7 +241,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         Intent intent=getIntent();
                         String roomId=intent.getStringExtra("roomId");
 
-                        database.child("rooms").child(roomId).child("settings").child("address").setValue(str);
+                        database.child("rooms").child(roomId).child("info").child("settings").child("address").setValue(str);
                     }
                 });
                 alert.create().show();
@@ -775,7 +775,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     Intent intent=getIntent();
                     String roomId=intent.getStringExtra("roomId");
 
-                    database.child("rooms").child(roomId).child("settings").child("address").setValue(address);
+                    database.child("rooms").child(roomId).child("info").child("settings").child("address").setValue(address);
                 }
             });
             alert.create().show();

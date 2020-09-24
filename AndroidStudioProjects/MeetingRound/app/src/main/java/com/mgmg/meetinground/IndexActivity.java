@@ -91,7 +91,7 @@ public class IndexActivity extends AppCompatActivity {
                 final String roomId = snapshot.getKey();
                 final String roomName = snapshot.getValue().toString();
 
-                database.child("rooms").child(snapshot.getKey()).child("settings").child("time").addListenerForSingleValueEvent(new ValueEventListener() {
+                database.child("rooms").child(snapshot.getKey()).child("info").child("settings").child("time").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
 //                snapshot.getValue();
@@ -242,10 +242,10 @@ public class IndexActivity extends AppCompatActivity {
             long timestamp = data.getLongExtra("timestamp", 0);
 
             database.child("users").child(uid).child("rooms").child(roomId).setValue(roomName);
-            database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
-            database.child("rooms").child(roomId).child("users").child(uid).child("host").setValue(true);
-            database.child("rooms").child(roomId).child("settings").child("title").setValue(roomName);
-            database.child("rooms").child(roomId).child("settings").child("time").setValue(timestamp);
+            database.child("rooms").child(roomId).child("info").child("users").child(uid).setValue(new UserDto(name, profile));
+            database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").setValue(true);
+            database.child("rooms").child(roomId).child("info").child("settings").child("title").setValue(roomName);
+            database.child("rooms").child(roomId).child("info").child("settings").child("time").setValue(timestamp);
             enter(roomId, roomName);
         }
     }
