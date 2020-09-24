@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:layout_margin="10dp"
     android:orientation="horizontal"
+
     app:layout_constraintCircleRadius="30dp">
 
     <LinearLayout
@@ -23,6 +24,8 @@
             android:background="#00FBFBFB"
             android:gravity="center|center_vertical"
             android:text="모임날짜"
+
+            android:fontFamily="@font/bmjua_ttf"
             android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -37,7 +40,10 @@
             android:id="@+id/tvRoomId"
             android:layout_width="match_parent"
             android:layout_height="45dp"
+            android:fontFamily="@font/bmjua_ttf"
             android:gravity="center|center_vertical"
+
+            android:paddingTop="10dp"
             android:text="모임이름"
             android:textStyle="bold" />
 
@@ -45,7 +51,10 @@
             android:id="@+id/tvTime"
             android:layout_width="match_parent"
             android:layout_height="45dp"
+            android:fontFamily="@font/bmjua_ttf"
             android:gravity="center|center_vertical"
+
+            android:paddingBottom="10dp"
             android:text="모임시간"
             android:textStyle="bold" />
 
