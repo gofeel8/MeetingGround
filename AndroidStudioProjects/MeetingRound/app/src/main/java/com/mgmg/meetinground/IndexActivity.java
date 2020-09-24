@@ -42,6 +42,7 @@ public class IndexActivity extends AppCompatActivity {
     Button btnMake, btnLogout;
     ImageView ivProfile;
     TextView tvId ,tvNickname;
+    ImageView test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,8 @@ public class IndexActivity extends AppCompatActivity {
 //        Glide.with(this).load(profile).into(ivProfile);
 //        tvId.setText(uid);
 //        tvNickname.setText(name);
+
+        test = findViewById(R.id.test);
 
         list = new ArrayList<>();
         roomAdapter = new RoomAdapter(getApplicationContext(), list);
@@ -123,6 +126,7 @@ public class IndexActivity extends AppCompatActivity {
                                 return rt ;
                             }
                         };
+                        test.setVisibility(View.INVISIBLE);
 
                         Collections.sort(list, comp) ;
                         roomAdapter.notifyDataSetChanged();
@@ -169,7 +173,11 @@ public class IndexActivity extends AppCompatActivity {
                     }
                 };
 
-                Collections.sort(list, comp) ;
+                if(list.size()==0){
+                    test.setVisibility(View.VISIBLE);
+                }else{
+                    Collections.sort(list, comp) ;
+                }
                 roomAdapter.notifyDataSetChanged();
             }
 
