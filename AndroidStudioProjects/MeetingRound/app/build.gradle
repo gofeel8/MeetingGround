@@ -3,6 +3,10 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
