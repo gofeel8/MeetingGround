@@ -63,7 +63,7 @@ public class MakeActivity extends AppCompatActivity {
         };
 
         Intent intent = getIntent();
-        etName.setText(intent.getStringExtra("name") + "의 방");
+        etName.setText(intent.getStringExtra("name") + "의 모임");
 
         btnMakeRoom.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -20,11 +20,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 public class IndexActivity extends AppCompatActivity {
 
@@ -65,14 +71,14 @@ public class IndexActivity extends AppCompatActivity {
 
         lvRooms = findViewById(R.id.lvRooms);
         btnMake = findViewById(R.id.btnMake);
-        btnLogout = findViewById(R.id.btnLogout);
-        ivProfile = findViewById(R.id.ivProfile);
-        tvId = findViewById(R.id.tvId);
-        tvNickname = findViewById(R.id.tvName);
+//        btnLogout = findViewById(R.id.btnLogout);
+//        ivProfile = findViewById(R.id.ivProfile);
+//        tvId = findViewById(R.id.tvId);
+//        tvNickname = findViewById(R.id.tvName);
 
-        Glide.with(this).load(profile).into(ivProfile);
-        tvId.setText(uid);
-        tvNickname.setText(name);
+//        Glide.with(this).load(profile).into(ivProfile);
+//        tvId.setText(uid);
+//        tvNickname.setText(name);
 
         list = new ArrayList<>();
         roomAdapter = new RoomAdapter(getApplicationContext(), list);
@@ -81,8 +87,62 @@ public class IndexActivity extends AppCompatActivity {
         database.child("users").child(uid).child("rooms").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                list.add(new RoomDto(snapshot.getKey(), snapshot.getValue().toString()));
-                roomAdapter.notifyDataSetChanged();
+
+                final String roomId = snapshot.getKey();
+                final String roomName = snapshot.getValue().toString();
+
+                database.child("rooms").child(snapshot.getKey()).child("settings").child("time").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                snapshot.getValue();
+                        Calendar calendar;
+                        String time;
+                        String date;
+                        calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis((Long) snapshot.getValue());
+                        list.add(new RoomDto(roomId, roomName,calendar));
+//                        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd", Locale.getDefault());
+//                        SimpleDateFormat timeFormat = new SimpleDateFormat(" HH:mm", Locale.getDefault());
+//                        date=dateFormat.format(calendar.getTime());
+//                        time=timeFormat.format(calendar.getTime());
+//                        Log.d("GPS","모임날짜  : "+date);
+//                        Log.d("GPS","모임시간  : "+time);
+//
+//                        list.add(new RoomDto(roomId, roomName,date,time));
+
+
+                        Comparator<RoomDto> comp = new Comparator<RoomDto>() {
+                            @Override
+                            public int compare(RoomDto o1, RoomDto o2) {
+                                int rt = 0;
+                                if (o1.getCalendar().before(o2.getCalendar()))
+                                    rt = 1 ;
+                                else
+                                    rt = -1 ;
+
+                                return rt ;
+                            }
+                        };
+
+                        Collections.sort(list, comp) ;
+                        roomAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+
+
+
+
+
+
+//                list.add(new RoomDto(snapshot.getKey(), snapshot.getValue().toString()));
+//                roomAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -96,6 +156,20 @@ public class IndexActivity extends AppCompatActivity {
                         list.remove(i);
                     }
                 }
+                Comparator<RoomDto> comp = new Comparator<RoomDto>() {
+                    @Override
+                    public int compare(RoomDto o1, RoomDto o2) {
+                        int rt = 0;
+                        if (o1.getCalendar().before(o2.getCalendar()))
+                            rt = 1 ;
+                        else
+                            rt = -1 ;
+
+                        return rt ;
+                    }
+                };
+
+                Collections.sort(list, comp) ;
                 roomAdapter.notifyDataSetChanged();
             }
 
@@ -110,9 +184,13 @@ public class IndexActivity extends AppCompatActivity {
             }
         });
 
+
+
         lvRooms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("gps","리스트뷰클릭 : "+position);
+
                 enter(list.get(position).getRoomId(), list.get(position).getRoomName());
             }
         });
@@ -126,21 +204,21 @@ public class IndexActivity extends AppCompatActivity {
             }
         });
 
-        btnLogout.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserManagement.getInstance()
-                        .requestLogout(new LogoutResponseCallback() {
-                            @Override
-                            public void onCompleteLogout() {
-                                Log.i("KAKAO_API", "로그아웃 완료");
-                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-            }
-        });
+//        btnLogout.setOnClickListener(new Button.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                UserManagement.getInstance()
+//                        .requestLogout(new LogoutResponseCallback() {
+//                            @Override
+//                            public void onCompleteLogout() {
+//                                Log.i("KAKAO_API", "로그아웃 완료");
+//                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                                startActivity(intent);
+//                                finish();
+//                            }
+//                        });
+//            }
+//        });
     }
 
     public void enter(String roomId, String roomName) {

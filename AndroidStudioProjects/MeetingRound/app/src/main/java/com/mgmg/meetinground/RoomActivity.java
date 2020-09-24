@@ -41,8 +41,8 @@ public class RoomActivity extends AppCompatActivity {
     UserAdapter userAdapter;
     List<UserDto> list;
     ListView lvUsers;
-    TextView tvRoomName;
-    Button btnSend, btnExit, btnmap;
+    TextView tvRoomName,tvRoomTime;
+    Button btnSend, btnExit, btnBack,btnmap, btnRecommend;
 
     Long meetingTime;
     Calendar calendar;
@@ -65,6 +65,7 @@ public class RoomActivity extends AppCompatActivity {
         roomId = intent.getStringExtra("roomId");
         roomName = intent.getStringExtra("roomName");
 
+
         database = FirebaseDatabase.getInstance().getReference();
 
         if (intent.getBooleanExtra("isFirst", false)) {
@@ -74,13 +75,16 @@ public class RoomActivity extends AppCompatActivity {
         updates.put("rooms/"+roomId+"/users/"+uid+"/name", name);
         updates.put("rooms/"+roomId+"/users/"+uid+"/profile", profile);
         database.updateChildren(updates);
-//        database.child("rooms").child(roomId).child("users").child(uid).setValue(new UserDto(name, profile));
 
         lvUsers = findViewById(R.id.lvUsers);
         tvRoomName = findViewById(R.id.tvRoomName);
+        tvRoomTime = findViewById(R.id.tvRoomTime);
+
         btnSend = findViewById(R.id.btnSend);
         btnExit = findViewById(R.id.btnExit);
-        btnmap=findViewById(R.id.btnmap);
+        btnBack = findViewById(R.id.btnBack);
+//        btnmap=findViewById(R.id.btnmap);
+//        btnRecommend = findViewById(R.id.btnRecommend);
 
         list = new ArrayList<>();
         userAdapter = new UserAdapter(getApplicationContext(), list);
@@ -105,6 +109,8 @@ public class RoomActivity extends AppCompatActivity {
                 Log.d("GPS",meetingTime.toString());
                 calendar.setTimeInMillis(meetingTime);
 
+                SimpleDateFormat format = new SimpleDateFormat("MM월dd일 HH시mm분", Locale.getDefault());
+                tvRoomTime.setText(format.format(calendar.getTime()));
 
                 if(calendar.before(Calendar.getInstance())){
                     Toast.makeText(RoomActivity.this, "지난 모임방에들어옴", Toast.LENGTH_SHORT).show();
@@ -115,6 +121,7 @@ public class RoomActivity extends AppCompatActivity {
                 Intent intent = new Intent(RoomActivity.this,AlarmReceiver.class);
                 intent.putExtra("uid",uid);
                 intent.putExtra("roomId",roomId);
+                intent.putExtra("roomName",roomName);
                 intent.putExtra("meetingTime",meetingTime);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(RoomActivity.this,_id,intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -128,7 +135,6 @@ public class RoomActivity extends AppCompatActivity {
                 alarmManager.set(AlarmManager.RTC_WAKEUP,startTime.getTimeInMillis(),pendingIntent);
 
                 //Toast보여주기(알람 시간 표시)
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 Toast.makeText(RoomActivity.this, "Alarm : "+format.format(startTime.getTime()), Toast.LENGTH_SHORT).show();
 
 
@@ -182,17 +188,25 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        btnmap.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(RoomActivity.this,MapActivity.class);
-                intent.putExtra("name",name);
-                intent.putExtra("profile",profile);
-                intent.putExtra("roomId",roomId);
-                intent.putExtra("roomName",roomName);
-                startActivity(intent);
-            }
-        });
+//        btnRecommend.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getApplicationContext(), RecommendActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+
+//        btnmap.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent=new Intent(RoomActivity.this,MapActivity.class);
+//                intent.putExtra("name",name);
+//                intent.putExtra("profile",profile);
+//                intent.putExtra("roomId",roomId);
+//                intent.putExtra("roomName",roomName);
+//                startActivity(intent);
+//            }
+//        });
 
         btnSend.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -235,6 +249,13 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
 
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setSelectedItemId(R.id.tab1);
@@ -246,11 +267,25 @@ public class RoomActivity extends AppCompatActivity {
                     case R.id.tab1:
                         return true;
                     case R.id.tab2:
+
                         Intent intent2=new Intent(RoomActivity.this,MapActivity.class);
                         intent2.putExtras(intent);
+                        intent2.putExtra("name",name);
+                        intent2.putExtra("profile",profile);
+                        intent2.putExtra("roomId",roomId);
+                        intent2.putExtra("roomName",roomName);
                         intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                         startActivity(intent2);
+
+                        return true;
+                    case R.id.tab3:
+                        Intent intent3 = new Intent(RoomActivity.this, RecommendActivity.class);
+
+                        intent3.putExtras(intent);
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                        startActivity(intent3);
 
                         return true;
 
@@ -260,5 +295,12 @@ public class RoomActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setSelectedItemId(R.id.tab1);
     }
 }

@@ -223,7 +223,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         }else {
             checkRunTimePermission();
         }
-        final TextView textview_address = (TextView)findViewById(R.id.textView);
+//        final TextView textview_address = (TextView)findViewById(R.id.textView);
 
 
         button2.setOnClickListener(new Button.OnClickListener(){
@@ -255,13 +255,23 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.tab1:
-                        final Intent intent = getIntent();
+                        Intent intent = getIntent();
                         Intent intent2=new Intent(MapActivity.this,RoomActivity.class);
                         intent2.putExtras(intent);
                         intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent2);
                         return true;
                     case R.id.tab2:
+                        return true;
+                    case R.id.tab3:
+                        intent = getIntent();
+                        Intent intent3 = new Intent(getApplicationContext(), RecommendActivity.class);
+                        intent3.putExtras(intent);
+
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                        startActivity(intent3);
+
                         return true;
 
                 }
@@ -270,6 +280,12 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setSelectedItemId(R.id.tab2);
+    }
     /*
      * ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
      */
@@ -696,7 +712,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                     Uri defaultSoundUri= RingtoneManager.getDefaultUri((RingtoneManager.TYPE_NOTIFICATION));
                     builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),android.R.drawable.ic_dialog_info))
-                            .setSmallIcon(R.mipmap.ic_logo)
+                            .setSmallIcon(R.mipmap.ic_launcher)
                             .setContentTitle("MGMG")
                             .setContentText("벌금이 부과됩니다.")
                             .setAutoCancel(true)
