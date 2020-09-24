@@ -111,6 +111,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
+        android:theme="@style/Widget.BottomNavigationView"
         app:menu="@menu/menu_bottom" />
 
     <Button
