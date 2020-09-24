@@ -44,8 +44,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -55,7 +58,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class AlarmService extends Service {
-
+    String roomName;
     Calendar EndTime;
 
     private static final String PACKAGE_NAME =
@@ -163,7 +166,7 @@ public class AlarmService extends Service {
             CharSequence name = getString(R.string.app_name);
             // Create the channel for the notification
             NotificationChannel mChannel =
-                    new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+                    new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW);
 
             // Set the Notification Channel for the Notification Manager.
             mNotificationManager.createNotificationChannel(mChannel);
@@ -175,6 +178,7 @@ public class AlarmService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String roomId = intent.getStringExtra("roomId");
         String uid = intent.getStringExtra("uid");
+        roomName = intent.getStringExtra("roomName");
         Long temptime = intent.getLongExtra("meetingTime",0);
         if(temptime != 0){
             long finishtime = 1; // 모임시간 finishtime분후 종료
@@ -190,6 +194,7 @@ public class AlarmService extends Service {
         }
         if(roomId !=null && uid !=null){
             userRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId).child("users").child(uid);
+
         }
 
         Log.i(TAG, "Service started");
@@ -292,32 +297,32 @@ public class AlarmService extends Service {
      * Returns the {@link NotificationCompat} used as part of the foreground service.
      */
     private Notification getNotification() {
-        Intent intent = new Intent(this, AlarmService.class);
+//        Intent intent = new Intent(this, AlarmService.class);
 
         CharSequence text = Utils.getLocationText(mLocation);
 
         // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
-        intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
+//        intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
 
         // The PendingIntent that leads to a call to onStartCommand() in this service.
-        PendingIntent servicePendingIntent = PendingIntent.getService(this, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+//        PendingIntent servicePendingIntent = PendingIntent.getService(this, 0, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
 
         // The PendingIntent to launch activity.
         PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class), 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .addAction(R.drawable.ic_launch, getString(R.string.launch_activity),
+                .addAction(R.drawable.ic_launch, "지도보기",
                         activityPendingIntent)
-                .addAction(R.drawable.ic_cancel, getString(R.string.remove_location_updates),
-                        servicePendingIntent)
-                .setContentText("게임이시작되었습니다")
-                .setContentTitle("MeetingGround")
-                .setOngoing(true)
+//                .addAction(R.drawable.ic_cancel, getString(R.string.remove_location_updates),
+//                        servicePendingIntent)
+                .setContentText("게임진행중")
+                .setContentTitle(roomName)
+                .setOngoing(false)
                 .setPriority(Notification.PRIORITY_HIGH)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setTicker(text)
                 .setWhen(System.currentTimeMillis());
 
         // Set the Channel ID for Android O.
