@@ -100,6 +100,7 @@ import java.util.concurrent.ExecutionException;
 
 public class MapActivity  extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener
 {
+    private static int Investment=0;
     private GpsTracker gpsTracker;
     private boolean GameStart=false;
     private String temploc,roomId,uid;
@@ -165,7 +166,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                meetingTime=Long.parseLong(snapshot.child("settings").child("time").getValue().toString());
+               meetingTime=Long.parseLong(snapshot.child("settings").child("time").getValue().toString());
                 //                // 1. 모임장소를 띄운다. + 자기장
                 if(snapshot.child("settings").child("address").getValue()==null) { // 모임장소가 정해지지 않았으면 내 위치만 띄워줌. -> 내 위치는 mapload때 띄워져 있음.
                     return;
@@ -208,10 +209,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     e.printStackTrace();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
@@ -479,6 +478,12 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
+    public static Bitmap loadSameple(String imgPath){
+        BitmapFactory.Options options=new BitmapFactory.Options();
+        options.inPreferredConfig= Bitmap.Config.RGB_565;
+        options.inJustDecodeBounds=true;
+        return BitmapFactory.decodeFile(imgPath,options);
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -494,16 +499,25 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                     gpsTracker = new GpsTracker(MapActivity.this);
                     String myurl=getIntent().getStringExtra("profile");
-                    if (android.os.Build.VERSION.SDK_INT > 9) {
-                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                        StrictMode.setThreadPolicy(policy);
+                    if(!myurl.equals("")) {
+                        if (android.os.Build.VERSION.SDK_INT > 9) {
+                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                            StrictMode.setThreadPolicy(policy);
+                        }
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+                        markerOptions.position(mine);
+                        markerOptions.title("mine");
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                        mMap.addMarker(markerOptions);
+                    }else{
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+                        markerOptions.position(mine);
+                        markerOptions.title("mine");
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(loadSameple(Uri.parse("android.resource://"+R.class.getPackage().getName()+"/"+R.drawable.logo).toString()))));
+                        mMap.addMarker(markerOptions);
                     }
-                    MarkerOptions markerOptions=new MarkerOptions();
-                    LatLng mine=(new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude()));
-                    markerOptions.position(mine);
-                    markerOptions.title("mine");
-                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
-                    mMap.addMarker(markerOptions);
                     // marker title
                     MarkerOptions markerOptions1=new MarkerOptions();
                     markerOptions1.title("click");
@@ -657,7 +671,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 if(users==null) {
                     return;
                 }
-
                 for(int i=0;i<users.size();i++){
                     String url=profile.get(i);
                     if(url==myurl)
@@ -692,6 +705,9 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
                     NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
                     NotificationCompat.Builder builder=null;
+
+                    Investment+=500;
+                    database.child("rooms").child(roomId).child("investment").child(uid).setValue(Investment);
 
 
                     if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
