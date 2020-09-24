@@ -72,6 +72,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -85,24 +86,29 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
 import java.util.concurrent.ExecutionException;
 
-public class MapActivity  extends AppCompatActivity implements OnMapReadyCallback
+public class MapActivity  extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener
 {
     private GpsTracker gpsTracker;
-
+    private boolean GameStart=false;
     private String temploc,roomId,uid;
     private EditText editText;
     private GoogleMap mMap;
     private Button button2;
     private DatabaseReference database;
     private Long meetingTime;
+    private String address;
     private String api_key="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ";
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -133,14 +139,13 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         Intent intent=getIntent();
         roomId=intent.getStringExtra("roomId");
         uid=intent.getStringExtra("uid");
-        meetingTime=intent.getLongExtra("meetingTime",0);
 
         database = FirebaseDatabase.getInstance().getReference();
 
         editText=(EditText)findViewById(R.id.editText);
 
         Places.initialize(getApplicationContext(),api_key);
-
+        magnetic_field(null,null,null,null,false);
         editText.setFocusable(false);
         editText.setOnClickListener(new View.OnClickListener(){
 
@@ -154,16 +159,54 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 startActivityForResult(intent,100);
             }
         });
-        database.child("rooms").child(roomId).child("users").child(uid).addValueEventListener(new ValueEventListener() {
+        database.child("rooms").child(roomId).addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
 
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) { // 위치정보가 받아지기 시작했을때
-                // 1. 모임장소를 띄운다. + 자기장
-//                System.out.println(database.child("rooms").child(roomId).child("settings").child("address").g);
-                // 2. 각자의 위치를 띄운다.
 
-                // 3. 게임시작이 되면 -> 본인이 자기장 밖에 있으면 알림+벌금적용.
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                meetingTime=Long.parseLong(snapshot.child("settings").child("time").getValue().toString());
+                //                // 1. 모임장소를 띄운다. + 자기장
+                if(snapshot.child("settings").child("address").getValue()==null) { // 모임장소가 정해지지 않았으면 내 위치만 띄워줌. -> 내 위치는 mapload때 띄워져 있음.
+                    return;
+                }
+                String str=snapshot.child("settings").child("address").getValue().toString();
+                Geocoder geocoder=new Geocoder(getBaseContext());
+                try{
+                    List<Address> addresses=geocoder.getFromLocationName(
+                            str,
+                            10);
+                    String []splitStr=addresses.get(0).toString().split(",");
+                    String address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
+                            splitStr[0].length()-2); // 주소 parsing
+                    String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
+                    String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
+                    final LatLng point = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
+                    if(snapshot.child("users").child(uid).child("lat").getValue()==null||snapshot.child("users").child(uid).child("lon").getValue()==null){ // 데이터베이스에 위치정보가 갱신 x -> 게임시작 x 목적지와 내위치만 표시해줌.
+                        magnetic_field(point,null,null,null,false);
+                        return;
+                    }
+                    GameStart=true;
+                    // 2. 각자의 위치를 띄운다.
+                    List<LatLng> position=new LinkedList<>();
+                    List<String> profile=new LinkedList<>();
+                    List<String> name=new LinkedList<>();
+                    Iterator<DataSnapshot> users=snapshot.child("users").getChildren().iterator();
+                    while(users.hasNext()){
+                        DataSnapshot snap=users.next();
+                        System.out.println(snap.getValue().toString());
+                        if(snap.child("lat").getValue()==null||snap.child("lon").getValue()==null)
+                            continue;
+                        String Lat=snap.child("lat").getValue().toString();
+                        String Lng=snap.child("lon").getValue().toString();
+                        profile.add(snap.child("profile").getValue().toString());
+                        name.add(snap.child("name").getValue().toString());
+                        position.add(new LatLng(Double.parseDouble(Lat),Double.parseDouble(Lng)));
+                    }
+                    magnetic_field(point,position,profile,name,true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -196,26 +239,10 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String str=editText.getText().toString();
-                        List<Address> addresses=null;
                         Intent intent=getIntent();
                         String roomId=intent.getStringExtra("roomId");
 
                         database.child("rooms").child(roomId).child("settings").child("address").setValue(str);
-                        Geocoder geocoder=new Geocoder(getBaseContext());
-                        try{
-                            addresses=geocoder.getFromLocationName(
-                                    str,
-                                    10);
-                            String []splitStr=addresses.get(0).toString().split(",");
-                            String address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
-                                    splitStr[0].length()-2); // 주소 parsing
-                            String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
-                            String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
-                            final LatLng point = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
-                            magnetic_field(point);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                     }
                 });
                 alert.create().show();
@@ -327,9 +354,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
 
             // 3.  위치 값을 가져올 수 있음
-
-
-
         } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
 
             // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
@@ -460,28 +484,61 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        gpsTracker = new GpsTracker(MapActivity.this);
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                {
+                    if(GameStart)
+                        return;
+                    mMap.clear();
 
-        double latitude = gpsTracker.getLatitude();
-        double longitude = gpsTracker.getLongitude();
+                    gpsTracker = new GpsTracker(MapActivity.this);
+                    String myurl=getIntent().getStringExtra("profile");
+                    if (android.os.Build.VERSION.SDK_INT > 9) {
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
+                    }
+                    MarkerOptions markerOptions=new MarkerOptions();
+                    LatLng mine=(new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude()));
+                    markerOptions.position(mine);
+                    markerOptions.title("mine");
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                    mMap.addMarker(markerOptions);
+                    // marker title
+                    MarkerOptions markerOptions1=new MarkerOptions();
+                    markerOptions1.title("click");
+                    markerOptions1.position(latLng);
+                    mMap.addMarker(markerOptions1);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
 
-        LatLng address = new LatLng(latitude, longitude);
+                }
+            }
+        });
+        mMap.setOnMarkerClickListener(this);
+//
+//        gpsTracker = new GpsTracker(MapActivity.this);
+//
+//        double latitude = gpsTracker.getLatitude();
+//        double longitude = gpsTracker.getLongitude();
+//
+//        LatLng address = new LatLng(latitude, longitude);
+//
+//        MarkerOptions markerOptions = new MarkerOptions();
+//        markerOptions.position(address);
+//        markerOptions.title("현위치");
+//        markerOptions.snippet("now");
+//        String url=getIntent().getStringExtra("profile");
+//        if (android.os.Build.VERSION.SDK_INT > 9) {
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
+//        }
+//        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(url)));
+//
+//        mMap.addMarker(markerOptions);
 
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(address);
-        markerOptions.title("현위치");
-        markerOptions.snippet("now");
-        String url=getIntent().getStringExtra("profile");
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(url)));
-
-        mMap.addMarker(markerOptions);
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(address));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(address));
+//        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
     }
 
     public Bitmap getBitmapFromLink(String link) {
@@ -562,46 +619,76 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         return Bitmap.createScaledBitmap(source, newWidth, newHeight, true);
     }
 
-    public void magnetic_field(final LatLng position){
+    public void magnetic_field(final LatLng position, final List<LatLng> users, final List<String> profile, final List<String> name, final boolean GameStart){
         handler.removeCallbacks(run);
-
-        // textview_address.setText(address);
-
-//                        Toast.makeText(MapActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-
-//                        final LatLng now = new LatLng(latitude,longitude);
-//                        final LatLng temp1 = new LatLng(36.335,127.34); // 임시로 찍어본 바깥영역 표시.
-//                        final LatLng temp2 = new LatLng(36.33,127.3353);
         run=new Runnable() {
             @Override
             public void run() {
                 mMap.clear();
 
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(position);
-                markerOptions.title("spot");
-                markerOptions.snippet("약속장소");
-                mMap.addMarker(markerOptions);
-
                 gpsTracker = new GpsTracker(MapActivity.this);
 
+                // 1. 내 위치 2. 목적지 3. 사람들 위치 4. 경고
+
                 // 현재 위치와 비교를 위한 현재 gps 찾기.
+                // 멤버들 위치 보기.
+                String myurl=getIntent().getStringExtra("profile");
+                if (android.os.Build.VERSION.SDK_INT > 9) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+                }
+                MarkerOptions markerOptions=new MarkerOptions();
+                LatLng mine=(new LatLng(gpsTracker.getLatitude(),gpsTracker.getLongitude()));
+                markerOptions.position(mine);
+                markerOptions.title("mine");
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                mMap.addMarker(markerOptions);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(mine));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                if(position==null)
+                    return;
+                markerOptions.position(position);
+                markerOptions.title("meeting place");
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                mMap.addMarker(markerOptions);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+
+                if(users==null) {
+                    return;
+                }
+
+                for(int i=0;i<users.size();i++){
+                    String url=profile.get(i);
+                    if(url==myurl)
+                        continue;
+                    markerOptions.position(users.get(i));
+                    markerOptions.title(name.get(i));
+                    if (android.os.Build.VERSION.SDK_INT > 9) {
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
+                    }
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(url)));
+                    mMap.addMarker(markerOptions);
+                }
                 LatLng now=new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
-                MarkerOptions markerOptions2=new MarkerOptions();
-                markerOptions2.position(now);
-                markerOptions2.title("now");
-                markerOptions2.snippet("내위치");
-                mMap.addMarker(markerOptions2);
 
                 com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
 
-//                Distance.add(new com.mgmg.meetinground.distance("temp1", SphericalUtil.computeDistanceBetween(now,temp1)));
 
-//                for(int i=0;i<Distance.size();i++){ 거리밖에 있는것 꺼내서 확인해보기~
-//                    if(Distance.get(i).getDistance()>circlesize){
-//                        System.out.println(Distance.get(i).getDistance());
-//                    }
-//                }
+//                circlesize-=100;
+//                if(circlesize>50)
+//                    handler.postDelayed(this,3000);
+//                else
+//                    mMap.clear();
+                circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
+                if(circlesize>0) {
+                    mMap.addCircle(new CircleOptions()
+                            .center(position)
+                            .radius(circlesize)
+                            .fillColor(Color.parseColor("#50F08080"))); // in meters
+                }
+
                 if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
                     NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
                     NotificationCompat.Builder builder=null;
@@ -640,19 +727,43 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
-
-                mMap.addCircle(new CircleOptions()
-                        .center(position)
-                        .radius(circlesize)
-                        .fillColor(Color.parseColor("#50F08080"))); // in meters
-                circlesize-=100;
-                if(circlesize>50)
-                    handler.postDelayed(this,3000);
-                else
-                    mMap.clear();
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
             }
         };
         handler.post(run);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        String temp=marker.getTitle();
+        if(temp.equals("click")){
+            AlertDialog.Builder alert = new AlertDialog.Builder(MapActivity.this);
+            LatLng now=marker.getPosition();
+            Geocoder geocoder=new Geocoder(getBaseContext());
+            try{
+                List<Address> addresses = geocoder.getFromLocation(now.latitude,now.longitude,1);
+                String []splitStr=addresses.get(0).toString().split(",");
+                 address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
+                        splitStr[0].length()-2); // 주소 parsing
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            alert.setTitle("선택지점");
+            alert.setMessage(address+"를 약속지점으로 선택하시겠습니까?");
+            alert.setNegativeButton("아니오",null);
+
+            alert.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    Intent intent=getIntent();
+                    String roomId=intent.getStringExtra("roomId");
+
+                    database.child("rooms").child(roomId).child("settings").child("address").setValue(address);
+                }
+            });
+            alert.create().show();
+        }
+        return false;
     }
 }
