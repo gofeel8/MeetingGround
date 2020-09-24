@@ -121,6 +121,7 @@ public class RoomActivity extends AppCompatActivity {
                 Intent intent = new Intent(RoomActivity.this,AlarmReceiver.class);
                 intent.putExtra("uid",uid);
                 intent.putExtra("roomId",roomId);
+                intent.putExtra("roomName",roomName);
                 intent.putExtra("meetingTime",meetingTime);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(RoomActivity.this,_id,intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
