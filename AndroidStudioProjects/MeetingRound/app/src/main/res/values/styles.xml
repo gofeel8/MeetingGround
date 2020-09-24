@@ -6,5 +6,14 @@
         <item name="colorPrimaryDark">@color/colorMyThemeDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="EditTextTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/colorMyThemeDark</item>
+        <item name="colorControlActivated">@color/colorMyThemeDark</item>
+        <item name="colorControlHighlight">@color/colorMyThemeDark</item>
+    </style>
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/colorMyThemeDark</item>
+    </style>
+
 
 </resources>
