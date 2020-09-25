@@ -1,6 +1,6 @@
 package com.mgmg.meetinground;
-
 import android.Manifest;
+
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
@@ -776,6 +776,17 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             alert.setTitle("선택지점");
             alert.setMessage(address+"를 약속지점으로 선택하시겠습니까?");
             alert.setNegativeButton("아니오",null);
+
+            alert.setNeutralButton("맛집추천받기", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(MapActivity.this,"현재위치"+now.toString(),Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent(MapActivity.this,RecommendActivity.class);
+                    intent.putExtra("lat",now.latitude);
+                    intent.putExtra("lon",now.longitude);
+                    startActivity(intent);
+                }
+            });
 
             alert.setPositiveButton("예", new DialogInterface.OnClickListener() {
                 @Override
