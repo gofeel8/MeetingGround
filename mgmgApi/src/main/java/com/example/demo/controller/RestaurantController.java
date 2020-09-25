@@ -11,13 +11,16 @@ import org.springframework.data.geo.Point;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.Info;
 import com.example.demo.dto.Restaurant;
 import com.example.demo.dto.Simil;
 import com.example.demo.service.RestaurantService;
 import com.example.demo.util.CosineSimilarity;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -29,9 +32,11 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
     private CosineSimilarity cs=new CosineSimilarity();
-    @GetMapping()
-    public List<Restaurant> getAll(){
-    	System.out.println("오스오스");
+   
+   
+    @PostMapping("/search")
+    @ApiOperation(value = "MgApi", tags = "search")
+    public List<Restaurant> getAll(Info info){    	
     	Point point = new Point(127.341441, 36.353687);
 		Distance distance = new Distance(1, Metrics.KILOMETERS);
 		List<Restaurant>list=restaurantService.findByLocNear(point, distance);
