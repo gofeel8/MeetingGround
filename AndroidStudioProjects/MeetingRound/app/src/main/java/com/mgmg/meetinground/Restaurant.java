@@ -19,6 +19,10 @@ public class Restaurant {
     int disagree;
 
     public Restaurant() {
+        name="name";
+        address= "address";
+        agree=0;
+        disagree=0;
     }
 
     public Restaurant(String name, String tel, String address, String area, String lat, String lon, String branch, String[] bhour_list, String[] category_list, String[] menu_list, String[] review_list, String[] tags, String[] images) {
@@ -104,4 +108,6 @@ public class Restaurant {
     public void setDisagree(int disagree) {
         this.disagree = disagree;
     }
+
+
 }
