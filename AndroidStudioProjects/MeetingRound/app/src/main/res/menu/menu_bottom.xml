@@ -18,7 +18,7 @@
         app:showAsAction="ifRoom"
         android:enabled="true"
         android:icon="@drawable/recommend"
-        android:title="맛집추천"/>
+        android:title="투표"/>
 
 
 </menu>

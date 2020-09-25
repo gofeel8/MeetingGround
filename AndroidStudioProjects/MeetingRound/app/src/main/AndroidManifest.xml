@@ -3,14 +3,12 @@
     package="com.mgmg.meetinground">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"></uses-permission>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-
-
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MyApplication"
@@ -21,26 +19,35 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".VoteActivity"></activity>
+
         <uses-library
             android:name="org.apache.http.legacy"
-            android:required="false"/>
+            android:required="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ"/>
-        <activity android:name=".RecommendActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".MakeActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".RoomActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".IndexActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".MapActivity"
-            android:screenOrientation="portrait"/>
+            android:value="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ" />
+
+        <activity
+            android:name=".RecommendActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MakeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RoomActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".IndexActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MapActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -51,33 +58,30 @@
                     android:host="kakaolink"
                     android:scheme="kakaoc08e3ab1a1c35e58420c4dc648cbeab4" />
             </intent-filter>
-
         </activity>
-        <activity android:name=".PermissionRequestActivity"
+        <activity
+            android:name=".PermissionRequestActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="c08e3ab1a1c35e58420c4dc648cbeab4" />
 
-
         <receiver
             android:name=".AlarmReceiver"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
 
-        <service android:name=".AlarmService"
-            android:foregroundServiceType="location"
-            android:enabled="true"/>
-
-
+        <service
+            android:name=".AlarmService"
+            android:enabled="true"
+            android:foregroundServiceType="location" />
     </application>
 
 </manifest>
