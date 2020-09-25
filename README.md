@@ -30,16 +30,11 @@
 
 ## Wireframe
 
-<!-- ![메인페이지](./wireframe/01_메인페이지.jpg) -->
-<img src="./wireframe/01_메인페이지.jpg"  width="120" height="120">
-<!-- ![대기실](./wireframe/02_대기실.jpg) -->
-<img src="./wireframe/02_대기실.jpg"  width="120" height="120">
-<!-- ![지도](./wireframe/03_지도.jpg) -->
-<img src="./wireframe/03_지도.jpg"  width="120" height="120">
-<!-- ![맛집추천](./wireframe/04_맛집추천.jpg) -->
-<img src="./wireframe/04_맛집추천.jpg"  width="120" height="120">
-<!-- ![투표](./wireframe/05_투표.jpg) -->
-<img src="./wireframe/05_투표.jpg"  width="120" height="120">
+![메인페이지|small](./wireframe/01_메인페이지.jpg)
+![대기실|small](./wireframe/02_대기실.jpg)
+![지도|small](./wireframe/03_지도.jpg)
+![맛집추천|small](./wireframe/04_맛집추천.jpg)
+![투표|small](./wireframe/05_투표.jpg)
 
 ## Capture
 
