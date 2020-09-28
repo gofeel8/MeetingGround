@@ -19,7 +19,7 @@ public class RestInfo {
 	private List<Object> bhour_list;
 	private List<Object> category_list;
 	private List<Object> menu_list;
-	private List<Object> review_list;
+	private List<String> review_list;
 	private List<String> tags;
 	private List<String> images;
 }
