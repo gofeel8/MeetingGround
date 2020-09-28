@@ -119,7 +119,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     private LinearLayout container;
     private List<Marker> marker;
 
-
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -172,6 +171,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 ////                startActivityForResult(intent,100);
 ////            }
 ////        });
+
 
         database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
             @Override
