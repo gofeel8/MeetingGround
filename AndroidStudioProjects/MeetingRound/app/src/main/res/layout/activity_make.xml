@@ -80,7 +80,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.435"
-        app:layout_constraintStart_toEndOf="@+id/imageView" />
+        app:layout_constraintStart_toEndOf="@+id/RestIMG" />
 
     <Button
         android:id="@+id/button"
@@ -115,7 +115,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvDate" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/RestIMG"
         android:layout_width="210dp"
         android:layout_height="232dp"
         android:layout_marginStart="16dp"
