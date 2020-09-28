@@ -146,7 +146,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         roomId=intent.getStringExtra("roomId");
         uid=intent.getStringExtra("uid");
         database = FirebaseDatabase.getInstance().getReference();
-        Investment=0;
+//        Investment=0;
 
         if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()==null){
             container.removeAllViews();
@@ -168,7 +168,21 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 startActivityForResult(intent,100);
             }
         });
+        database.child("rooms").child(roomId).child("investment").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue() != null) {
+                    Investment = (int) (long) snapshot.getValue();
+                }else{
+                    Investment = 0;
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

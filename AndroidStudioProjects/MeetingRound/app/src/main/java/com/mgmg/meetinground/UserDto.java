@@ -9,12 +9,32 @@ public class UserDto {
 
     private String name;
     private String profile;
+    private String uId;
+    private int invest;
 
     public UserDto(){};
 
-    public UserDto(String name, String profile) {
+    public UserDto(String name, String profile, String uId) {
         this.name = name;
         this.profile = profile;
+        this.uId = uId;
+        invest = 0;
+    }
+
+    public int getInvest() {
+        return invest;
+    }
+
+    public void setInvest(int invest) {
+        this.invest = invest;
+    }
+
+    public String getuId() {
+        return uId;
+    }
+
+    public void setuId(String uId) {
+        this.uId = uId;
     }
 
     public String getName() {
