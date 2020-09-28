@@ -148,7 +148,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         roomId=intent.getStringExtra("roomId");
         uid=intent.getStringExtra("uid");
         database = FirebaseDatabase.getInstance().getReference();
-        Investment=0;
+//        Investment=0;
         marker=new LinkedList<>();
 
         if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()==null){
@@ -172,7 +172,31 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 ////            }
 ////        });
 
+            @Override
+            public void onClick(View view) {
+                List<Place.Field> fieldList=Arrays.asList(Place.Field.ADDRESS
+                        ,Place.Field.LAT_LNG,Place.Field.NAME);
 
+                Intent intent=new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY
+                        ,fieldList).build(MapActivity.this);
+                startActivityForResult(intent,100);
+            }
+        });
+        database.child("rooms").child(roomId).child("investment").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue() != null) {
+                    Investment = (int) (long) snapshot.getValue();
+                }else{
+                    Investment = 0;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -180,21 +204,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                 if(position==null)
                     return;
-                mMap.clear();
                 com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
-
-                circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
-                if(circlesize<100)
-                    circlesize=100;
-                mMap.addCircle(new CircleOptions()
-                        .center(position)
-                        .radius(circlesize)
-                        .fillColor(Color.parseColor("#50F08080"))); // in meters
-                if(!first){
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-                    first=true;
-                }
 
                 if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
                     NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
