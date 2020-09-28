@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -30,6 +31,7 @@ public class RecommendActivity extends AppCompatActivity {
     boolean[] checked;
     List<Restaurant> restaurants;
     double lat, lon;
+    String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class RecommendActivity extends AppCompatActivity {
         Intent intent = getIntent();
         lat = intent.getDoubleExtra("lat", 0);
         lon = intent.getDoubleExtra("lon", 0);
+        uid = intent.getStringExtra("uid");
 
         checked = new boolean[keys.length];
         keyAdapter = new StringAdapter(getApplicationContext(), keys, checked);
@@ -60,7 +63,10 @@ public class RecommendActivity extends AppCompatActivity {
                 obj.put("keys", arr);
 
                 // Add the request to the RequestQueue.
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, obj, response -> System.out.println(response), error -> System.out.println(error));
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, obj, response -> {
+                    System.out.println(response);
+                    resultAdapter.notifyDataSetChanged();
+                }, error -> error.printStackTrace());
                 queue.add(jsonObjectRequest);
 
             } catch (JSONException e) {
@@ -77,6 +83,9 @@ public class RecommendActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
+                intent.putExtra("obj", restaurants.get(position));
+                intent.putExtra("uid", uid);
+                startActivity(intent);
             }
         });
     }
