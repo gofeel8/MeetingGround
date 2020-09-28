@@ -108,6 +108,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     private EditText editText;
     private GoogleMap mMap;
     private Button button2;
+    private LatLng position;
     private DatabaseReference database;
     private Long meetingTime;
     private String address;
@@ -147,7 +148,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         editText=(EditText)findViewById(R.id.editText);
 
         Places.initialize(getApplicationContext(),api_key);
-        magnetic_field(null,null,null,null,false);
+        magnetic_field(null,null,null,false);
         editText.setFocusable(false);
         editText.setOnClickListener(new View.OnClickListener(){
 
@@ -161,6 +162,63 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 startActivityForResult(intent,100);
             }
         });
+
+        database.child("rooms").child(roomId).child("info").child("users").child(uid).addValueEventListener(new ValueEventListener(){
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                LatLng now=new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
+
+                if(position==null)
+                    return;
+                com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
+
+                if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
+                    NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                    NotificationCompat.Builder builder=null;
+
+                    Investment+=100;
+                    database.child("rooms").child(roomId).child("investment").child(uid).setValue(Investment);
+
+
+                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+                        String channelID="channel_01";
+                        String channelName="MyChannel01";
+
+                        NotificationChannel channel=new NotificationChannel(channelID,channelName,NotificationManager.IMPORTANCE_DEFAULT);
+                        notificationManager.createNotificationChannel(channel);
+
+                        builder=new NotificationCompat.Builder(MapActivity.this,channelID);
+                    }else{
+                        builder=new NotificationCompat.Builder(MapActivity.this,null);
+                    }
+
+                    Intent push=new Intent(getApplicationContext(),MapActivity.class); // intent안에 이동할 class를 적어줌.
+                    push.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    PendingIntent fullScreen=PendingIntent.getActivity(MapActivity.this,0,push,PendingIntent.FLAG_UPDATE_CURRENT);
+
+                    Uri defaultSoundUri= RingtoneManager.getDefaultUri((RingtoneManager.TYPE_NOTIFICATION));
+                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),android.R.drawable.ic_dialog_info))
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("MGMG")
+                            .setContentText("벌금이 부과됩니다.")
+                            .setAutoCancel(true)
+                            .setPriority(NotificationCompat.PRIORITY_MAX)
+                            .setDefaults(NotificationCompat.DEFAULT_ALL)
+                            .setSound(defaultSoundUri)
+                            .setContentIntent(fullScreen)
+                            .setFullScreenIntent(fullScreen,true);
+
+                    notificationManager.notify(1,builder.build());
+//                        notificationManager.cancel(1);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         database.child("rooms").child(roomId).child("info").addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
 
@@ -183,29 +241,30 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                             splitStr[0].length()-2); // 주소 parsing
                     String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
                     String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
-                    final LatLng point = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
+                    position = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
                     if(snapshot.child("users").child(uid).child("lat").getValue()==null||snapshot.child("users").child(uid).child("lon").getValue()==null){ // 데이터베이스에 위치정보가 갱신 x -> 게임시작 x 목적지와 내위치만 표시해줌.
-                        magnetic_field(point,null,null,null,false);
+                        magnetic_field(null,null,null,false);
                         return;
                     }
                     GameStart=true;
                     // 2. 각자의 위치를 띄운다.
-                    List<LatLng> position=new LinkedList<>();
+//                    List<LatLng> position=new LinkedList<>();
+                    List<LatLng> user_pos=new LinkedList<>();
                     List<String> profile=new LinkedList<>();
                     List<String> name=new LinkedList<>();
                     Iterator<DataSnapshot> users=snapshot.child("users").getChildren().iterator();
-                    while(users.hasNext()){
-                        DataSnapshot snap=users.next();
-                        System.out.println(snap.getValue().toString());
-                        if(snap.child("lat").getValue()==null||snap.child("lon").getValue()==null)
+                    while(users.hasNext()) {
+                        DataSnapshot snap = users.next();
+                        if (snap.child("lat").getValue() == null || snap.child("lon").getValue() == null)
                             continue;
-                        String Lat=snap.child("lat").getValue().toString();
-                        String Lng=snap.child("lon").getValue().toString();
+                        String Lat = snap.child("lat").getValue().toString();
+                        String Lng = snap.child("lon").getValue().toString();
                         profile.add(snap.child("profile").getValue().toString());
                         name.add(snap.child("name").getValue().toString());
-                        position.add(new LatLng(Double.parseDouble(Lat),Double.parseDouble(Lng)));
+//                        position.add(new LatLng(Double.parseDouble(Lat),Double.parseDouble(Lng)));
+                        user_pos.add(new LatLng(Double.parseDouble(Lat),Double.parseDouble(Lng)));
                     }
-                    magnetic_field(point,position,profile,name,true);
+                    magnetic_field(user_pos,profile,name,true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -627,7 +686,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         return Bitmap.createScaledBitmap(source, newWidth, newHeight, true);
     }
 
-    public void magnetic_field(final LatLng position, final List<LatLng> users, final List<String> profile, final List<String> name, final boolean GameStart){
+    public void magnetic_field(final List<LatLng> users, final List<String> profile, final List<String> name, final boolean GameStart){
         handler.removeCallbacks(run);
         run=new Runnable() {
             @Override
@@ -697,12 +756,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                 com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
 
-
-//                circlesize-=100;
-//                if(circlesize>50)
-//                    handler.postDelayed(this,3000);
-//                else
-//                    mMap.clear();
                 circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
                 if(circlesize>0) {
                     mMap.addCircle(new CircleOptions()
@@ -710,53 +763,13 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                             .radius(circlesize)
                             .fillColor(Color.parseColor("#50F08080"))); // in meters
                 }
-
-                if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
-                    NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-                    NotificationCompat.Builder builder=null;
-
-                    Investment+=100;
-                    database.child("rooms").child(roomId).child("investment").child(uid).setValue(Investment);
-
-
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
-                        String channelID="channel_01";
-                        String channelName="MyChannel01";
-
-                        NotificationChannel channel=new NotificationChannel(channelID,channelName,NotificationManager.IMPORTANCE_DEFAULT);
-                        notificationManager.createNotificationChannel(channel);
-
-                        builder=new NotificationCompat.Builder(MapActivity.this,channelID);
-                    }else{
-                        builder=new NotificationCompat.Builder(MapActivity.this,null);
-                    }
-
-                    Intent push=new Intent(getApplicationContext(),MapActivity.class); // intent안에 이동할 class를 적어줌.
-                    push.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent fullScreen=PendingIntent.getActivity(MapActivity.this,0,push,PendingIntent.FLAG_UPDATE_CURRENT);
-
-                    Uri defaultSoundUri= RingtoneManager.getDefaultUri((RingtoneManager.TYPE_NOTIFICATION));
-                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),android.R.drawable.ic_dialog_info))
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle("MGMG")
-                            .setContentText("벌금이 부과됩니다.")
-                            .setAutoCancel(true)
-                            .setPriority(NotificationCompat.PRIORITY_MAX)
-                            .setDefaults(NotificationCompat.DEFAULT_ALL)
-                            .setSound(defaultSoundUri)
-                            .setContentIntent(fullScreen)
-                            .setFullScreenIntent(fullScreen,true);
-
-                    notificationManager.notify(1,builder.build());
-//                        notificationManager.cancel(1);
-                }
-
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
             }
         };
         handler.post(run);
     }
+
 
     @Override
     public boolean onMarkerClick(Marker marker) {
