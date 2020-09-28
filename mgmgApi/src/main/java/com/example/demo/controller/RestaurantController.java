@@ -28,6 +28,7 @@ import com.example.demo.dto.Simil;
 import com.example.demo.dto.Tags;
 import com.example.demo.service.RestaurantService;
 import com.example.demo.util.CosineSimilarity;
+import com.google.gson.Gson;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.NonNull;
@@ -44,10 +45,10 @@ public class RestaurantController {
     private RestaurantService restaurantService;
     private CosineSimilarity cs=new CosineSimilarity();
     private Tags tagArr=new Tags();
-    
+    private Gson gson=new Gson();
     @PostMapping("/search")
     @ApiOperation(value = "MgApi", tags = "search")
-    public List<RestInfo> getAll(@RequestBody Info info){            	
+    public String getAll(@RequestBody Info info){            	
     	
         Point point = new Point(info.getLat(),info.getLon());    	
 		Distance distance = new Distance(10, Metrics.KILOMETERS);
@@ -104,6 +105,9 @@ public class RestaurantController {
 			r.setImages(el.getImages());
 			res.add(r);
 		}
-    	return res;
+		Map<String,Object>map=new HashMap<>();
+		map.put("result", res);
+		System.out.println(gson.toJson(map));
+    	return gson.toJson(map);
     }
 }
