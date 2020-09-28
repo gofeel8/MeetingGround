@@ -47,13 +47,15 @@ public class RestaurantController {
     @PostMapping("/search")
     @ApiOperation(value = "MgApi", tags = "search")
     public List<RestInfo> getAll(@RequestBody Info info){    	
-    	
+    	System.out.println("--------------------");
+    	System.out.println("lat:"+Math.round(info.getLat()*1000)/1000.0+" lon: "+Math.round(info.getLon()*1000)/1000.0);
+    	System.out.println("--------------------");
     	Point point = new Point(Math.round(info.getLat()*1000)/1000.0,Math.round(info.getLon()*1000)/1000.0);
 		Distance distance = new Distance(1, Metrics.KILOMETERS);
 		List<Restaurant>list=restaurantService.findByLocNear(point, distance);
-		for(Restaurant el:list) {
-			System.out.println("쿼리 결과:"+el);
-		}
+//		for(Restaurant el:list) {
+//			System.out.println("쿼리 결과:"+el);
+//		}
 		int cnt=0;
 		ArrayList<Simil>csList=new ArrayList<>();
 		int[] a=new int[24];
@@ -80,7 +82,7 @@ public class RestaurantController {
 		}
 		ArrayList<RestInfo>res=new ArrayList<>();
 		for(Restaurant el:result) {
-			System.out.println("분석결과:"+el);
+			//System.out.println("분석결과:"+el);
 			RestInfo r=new RestInfo();
 			r.setId(el.getId().toHexString());
 			r.setName(el.getName());
