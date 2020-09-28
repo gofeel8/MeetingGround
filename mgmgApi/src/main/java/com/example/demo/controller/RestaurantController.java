@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Circle;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
@@ -47,12 +48,15 @@ public class RestaurantController {
     @PostMapping("/search")
     @ApiOperation(value = "MgApi", tags = "search")
     public List<RestInfo> getAll(@RequestBody Info info){    	
-    	Point point = new Point(info.getLat(), info.getLon());
+           	
+        Point point = new Point(info.getLat(),info.getLon());
 		Distance distance = new Distance(1, Metrics.KILOMETERS);
-		List<Restaurant>list=restaurantService.findByLocNear(point, distance);
-		for(Restaurant el:list) {
-			System.out.println("쿼리 결과:"+el);
-		}
+		Circle area=new Circle(point, distance);
+		List<Restaurant>list=restaurantService.findByLocWithin(area);	
+		
+//		for(Restaurant el:list) {
+//			System.out.println("쿼리 결과:"+el);
+//		}
 		int cnt=0;
 		ArrayList<Simil>csList=new ArrayList<>();
 		int[] a=new int[24];
@@ -79,7 +83,7 @@ public class RestaurantController {
 		}
 		ArrayList<RestInfo>res=new ArrayList<>();
 		for(Restaurant el:result) {
-			System.out.println("분석결과:"+el);
+			//System.out.println("분석결과:"+el);
 			RestInfo r=new RestInfo();
 			r.setId(el.getId().toHexString());
 			r.setName(el.getName());

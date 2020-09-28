@@ -42,7 +42,10 @@ public class VoteActivity extends AppCompatActivity {
             @Override
             public void OnItemClick(VoteAdapter.ViewHolder holder, View view, int position) {
                 Restaurant item = adapter.getItem(position);
-                Toast.makeText(VoteActivity.this, "아이템 선택됨 : "+item.getName(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(VoteActivity.this, "아이템 선택됨 : "+item.getName(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), RestaurantDetail.class);
+                intent.putExtra("obj",item);
+                startActivity(intent);
             }
         });
 
