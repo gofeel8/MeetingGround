@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+      backend:
+          build:
+                  context: mgmgApi
+          container_name: back
+          restart: always
+          ports:
+          - 8080:8080
+
+
