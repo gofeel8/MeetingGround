@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.ArrayList;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,9 +29,11 @@ import com.example.demo.service.RestaurantService;
 import com.example.demo.util.CosineSimilarity;
 
 import io.swagger.annotations.ApiOperation;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+@CrossOrigin(origins = {"*"}, maxAge = 6000)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
