@@ -47,10 +47,10 @@ public class RestaurantController {
     
     @PostMapping("/search")
     @ApiOperation(value = "MgApi", tags = "search")
-    public List<RestInfo> getAll(@RequestBody Info info){    	
-           	
-        Point point = new Point(info.getLat(),info.getLon());
-		Distance distance = new Distance(1, Metrics.KILOMETERS);
+    public List<RestInfo> getAll(@RequestBody Info info){            	
+    	
+        Point point = new Point(info.getLat(),info.getLon());    	
+		Distance distance = new Distance(10, Metrics.KILOMETERS);
 		Circle area=new Circle(point, distance);
 		List<Restaurant>list=restaurantService.findByLocWithin(area);	
 		
