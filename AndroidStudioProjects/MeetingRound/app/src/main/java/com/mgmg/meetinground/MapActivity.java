@@ -104,7 +104,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 {
     private static int Investment=0;
     private GpsTracker gpsTracker;
-    private boolean GameStart=false;
+    private boolean GameStart=false,host;
     private String temploc,roomId,uid;
     private EditText editText;
     private GoogleMap mMap;
@@ -140,14 +140,11 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment=(SupportMapFragment)getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        container=findViewById(R.id.selection);
 
         Intent intent=getIntent();
         roomId=intent.getStringExtra("roomId");
         uid=intent.getStringExtra("uid");
-
-        container=findViewById(R.id.selection);
-
         database = FirebaseDatabase.getInstance().getReference();
 
         if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()==null){
@@ -155,7 +152,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         editText=(EditText)findViewById(R.id.editText);
-
         Places.initialize(getApplicationContext(),api_key);
         magnetic_field(null,null,null,false);
         editText.setFocusable(false);
@@ -231,10 +227,13 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         database.child("rooms").child(roomId).child("info").addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
 
-
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-               meetingTime=Long.parseLong(snapshot.child("settings").child("time").getValue().toString());
+                try{
+                    meetingTime=Long.parseLong(snapshot.child("settings").child("time").getValue().toString());
+                }catch (Exception E){
+                    finish();
+                }
                 //                // 1. 모임장소를 띄운다. + 자기장
                 if(snapshot.child("settings").child("address").getValue()==null) { // 모임장소가 정해지지 않았으면 내 위치만 띄워줌. -> 내 위치는 mapload때 띄워져 있음.
                     return;
@@ -301,10 +300,9 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 AlertDialog.Builder alert = new AlertDialog.Builder(MapActivity.this);
                 String pos=editText.getText().toString();
                 alert.setTitle("선택지점");
-                alert.setMessage(pos+"를 출발지점으로 선택하시겠습니까?");
-                alert.setNegativeButton("아니오",null);
+                alert.setMessage(pos+"를 선택하셨습니다.");
 
-                alert.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                alert.setPositiveButton("모임장소지정", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String str=editText.getText().toString();
@@ -314,6 +312,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         database.child("rooms").child(roomId).child("info").child("settings").child("address").setValue(str);
                     }
                 });
+                alert.setNegativeButton("취소",null);
                 alert.create().show();
             }
         });
@@ -334,7 +333,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         return true;
                     case R.id.tab3:
                         intent = getIntent();
-                        Intent intent3 = new Intent(getApplicationContext(), RecommendActivity.class);
+                        Intent intent3 = new Intent(getApplicationContext(), VoteActivity.class);
                         intent3.putExtras(intent);
 
                         intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -552,7 +551,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -577,7 +575,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     }else{
                         BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
                         Bitmap b=bitmapDrawable.getBitmap();
-                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
+                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
                         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
                     }
                     mMap.addMarker(markerOptions);
@@ -585,6 +583,10 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     MarkerOptions markerOptions1=new MarkerOptions();
                     markerOptions1.title("click");
                     markerOptions1.position(latLng);
+                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.clicked);
+                    Bitmap b=bitmapDrawable.getBitmap();
+                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                    markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
                     mMap.addMarker(markerOptions1);
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
@@ -735,7 +737,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     return;
                 markerOptions.position(position);
                 markerOptions.title("meeting place");
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
                 mMap.addMarker(markerOptions);
                 if(!GameStart) {
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
@@ -797,14 +799,14 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             try{
                 List<Address> addresses = geocoder.getFromLocation(now.latitude,now.longitude,1);
                 String []splitStr=addresses.get(0).toString().split(",");
-                 address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
+                address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
                         splitStr[0].length()-2); // 주소 parsing
             }catch (IOException e){
                 e.printStackTrace();
             }
             alert.setTitle("선택지점");
-            alert.setMessage(address+"를 약속지점으로 선택하시겠습니까?");
-            alert.setNegativeButton("아니오",null);
+            alert.setMessage(address+"를 선택하셨습니다.");
+
 
             alert.setNeutralButton("맛집추천받기", new DialogInterface.OnClickListener() {
                 @Override
@@ -816,17 +818,19 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     startActivity(intent);
                 }
             });
+            if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()!=null) {
+                alert.setPositiveButton("모임장소지정", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-            alert.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = getIntent();
+                        String roomId = intent.getStringExtra("roomId");
 
-                    Intent intent=getIntent();
-                    String roomId=intent.getStringExtra("roomId");
-
-                    database.child("rooms").child(roomId).child("info").child("settings").child("address").setValue(address);
-                }
-            });
+                        database.child("rooms").child(roomId).child("info").child("settings").child("address").setValue(address);
+                    }
+                });
+            }
+            alert.setNegativeButton("취소",null);
             alert.create().show();
         }
         return false;

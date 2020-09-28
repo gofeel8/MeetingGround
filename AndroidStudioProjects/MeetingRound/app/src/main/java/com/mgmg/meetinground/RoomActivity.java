@@ -280,7 +280,7 @@ public class RoomActivity extends AppCompatActivity {
 
                         return true;
                     case R.id.tab3:
-                        Intent intent3 = new Intent(RoomActivity.this, RecommendActivity.class);
+                        Intent intent3 = new Intent(RoomActivity.this, VoteActivity.class);
 
                         intent3.putExtras(intent);
                         intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
