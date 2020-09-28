@@ -32,6 +32,7 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -116,6 +117,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     private String api_key="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ";
     static boolean first=false;
     private LinearLayout container;
+    private List<Marker> marker;
+
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -147,6 +150,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         uid=intent.getStringExtra("uid");
         database = FirebaseDatabase.getInstance().getReference();
         Investment=0;
+        marker=new LinkedList<>();
 
         if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()==null){
             container.removeAllViews();
@@ -155,19 +159,19 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         editText=(EditText)findViewById(R.id.editText);
         Places.initialize(getApplicationContext(),api_key);
         magnetic_field(null,null,null,false);
-        editText.setFocusable(false);
-        editText.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View view) {
-                List<Place.Field> fieldList=Arrays.asList(Place.Field.ADDRESS
-                        ,Place.Field.LAT_LNG,Place.Field.NAME);
-
-                Intent intent=new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY
-                        ,fieldList).build(MapActivity.this);
-                startActivityForResult(intent,100);
-            }
-        });
+ //       editText.setFocusable(false);
+//        editText.setOnClickListener(new View.OnClickListener(){
+////
+////            @Override
+////            public void onClick(View view) {
+////                List<Place.Field> fieldList=Arrays.asList(Place.Field.ADDRESS
+////                        ,Place.Field.LAT_LNG,Place.Field.NAME);
+////
+////                Intent intent=new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY
+////                        ,fieldList).build(MapActivity.this);
+////                startActivityForResult(intent,100);
+////            }
+////        });
 
         database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
             @Override
@@ -176,7 +180,21 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                 if(position==null)
                     return;
+                mMap.clear();
                 com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
+
+                circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
+                if(circlesize<100)
+                    circlesize=100;
+                mMap.addCircle(new CircleOptions()
+                        .center(position)
+                        .radius(circlesize)
+                        .fillColor(Color.parseColor("#50F08080"))); // in meters
+                if(!first){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                    first=true;
+                }
 
                 if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
                     NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -298,23 +316,82 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         button2.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder alert = new AlertDialog.Builder(MapActivity.this);
-                String pos=editText.getText().toString();
-                alert.setTitle("선택지점");
-                alert.setMessage(pos+"를 선택하셨습니다.");
+                // 처음 기획은 다이어로그로 위치를 선택할 지 알려주는 것이었으나 변경.
+//                AlertDialog.Builder alert = new AlertDialog.Builder(MapActivity.this);
+//                String pos=editText.getText().toString();
+//                alert.setTitle("선택지점");
+//                alert.setMessage(pos+"를 선택하셨습니다.");
+//
+//                alert.setPositiveButton("모임장소지정", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        String str=editText.getText().toString();
+//                        Intent intent=getIntent();
+//                        String roomId=intent.getStringExtra("roomId");
+//
+//                        database.child("rooms").child(roomId).child("info").child("settings").child("address").setValue(str);
+//                    }
+//                });
+//                alert.setNegativeButton("취소",null);
+//                alert.create().show();
+                // marker를 추가
+                mMap.clear();
 
-                alert.setPositiveButton("모임장소지정", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String str=editText.getText().toString();
-                        Intent intent=getIntent();
-                        String roomId=intent.getStringExtra("roomId");
+                String str=editText.getText().toString();
 
-                        database.child("rooms").child(roomId).child("info").child("settings").child("address").setValue(str);
+                editText.setText("");
+
+                gpsTracker = new GpsTracker(MapActivity.this);
+                String myurl=getIntent().getStringExtra("profile");
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+                markerOptions.position(mine);
+                markerOptions.title("mine");
+                if(!myurl.equals("")) {
+                    if (android.os.Build.VERSION.SDK_INT > 9) {
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
                     }
-                });
-                alert.setNegativeButton("취소",null);
-                alert.create().show();
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                }else{
+                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
+                    Bitmap b=bitmapDrawable.getBitmap();
+                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
+                }
+                mMap.addMarker(markerOptions);
+
+                // marker title
+                Geocoder geocoder=new Geocoder(getBaseContext());
+                try {
+                    List<Address> addresses=geocoder.getFromLocationName(
+                            str,
+                            10);
+                    if(addresses.size()==0){
+                        Toast.makeText(MapActivity.this,"조금 더 정확한 명칭을 넣어주세요.",Toast.LENGTH_SHORT).show();
+                    }else{
+                    String []splitStr=addresses.get(0).toString().split(",");
+                    String address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
+                            splitStr[0].length()-2); // 주소 parsing
+                    String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
+                    String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
+                    position = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
+                    MarkerOptions markerOptions1=new MarkerOptions();
+                    markerOptions1.title("click");
+                    markerOptions1.position(position);
+                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click);
+                    Bitmap b=bitmapDrawable.getBitmap();
+                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                    markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+                    mMap.addMarker(markerOptions1);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                InputMethodManager imm=(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(editText.getWindowToken(),0);
             }
         });
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
@@ -556,6 +633,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onMapClick(LatLng latLng) {
                 {
+                    InputMethodManager imm=(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(editText.getWindowToken(),0);
                     if(GameStart)
                         return;
                     mMap.clear();
@@ -584,13 +663,11 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     MarkerOptions markerOptions1=new MarkerOptions();
                     markerOptions1.title("click");
                     markerOptions1.position(latLng);
-                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.clicked);
+                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click);
                     Bitmap b=bitmapDrawable.getBitmap();
                     Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
                     markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
                     mMap.addMarker(markerOptions1);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
 
                 }
             }
@@ -652,6 +729,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 squareBitmapWidth, // Height
                 Bitmap.Config.ARGB_8888 // Config
         );
+
         Canvas canvas = new Canvas(dstBitmap);
         // Initialize a new Paint instance
         Paint paint = new Paint();
@@ -704,7 +782,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         run=new Runnable() {
             @Override
             public void run() {
-                mMap.clear();
 
                 gpsTracker = new GpsTracker(MapActivity.this);
 
@@ -712,27 +789,29 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                 // 현재 위치와 비교를 위한 현재 gps 찾기.
                 // 멤버들 위치 보기.
-                String myurl=getIntent().getStringExtra("profile");
                 MarkerOptions markerOptions = new MarkerOptions();
-                LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
-                markerOptions.position(mine);
-                markerOptions.title("mine");
-                if(!myurl.equals("")) {
-                    if (android.os.Build.VERSION.SDK_INT > 9) {
-                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                        StrictMode.setThreadPolicy(policy);
+                if(users==null) {
+                    String myurl = getIntent().getStringExtra("profile");
+                    LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+                    markerOptions.position(mine);
+                    markerOptions.title("mine");
+                    if (!myurl.equals("")) {
+                        if (android.os.Build.VERSION.SDK_INT > 9) {
+                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                            StrictMode.setThreadPolicy(policy);
+                        }
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                    } else {
+                        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.logo);
+                        Bitmap b = bitmapDrawable.getBitmap();
+                        Bitmap smallMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
                     }
-                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
-                }else{
-                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
-                    Bitmap b=bitmapDrawable.getBitmap();
-                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
-                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
-                }
-                mMap.addMarker(markerOptions);
-                if(!GameStart) {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(mine));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                    mMap.addMarker(markerOptions);
+                    if(!GameStart) {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(mine));
+                        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                    }
                 }
                 if(position==null)
                     return;
@@ -748,41 +827,31 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     return;
                 }
                 for(int i=0;i<users.size();i++){
+                    Marker m;
+                    if(marker.size()>i+1) {
+                        m = marker.get(i);
+                        m.remove();
+                    }
                     String url=profile.get(i);
-                    if(users.get(i)==mine)
-                        continue;
                     markerOptions.position(users.get(i));
                     markerOptions.title(name.get(i));
-
                     if(!url.equals("")) {
                         if (android.os.Build.VERSION.SDK_INT > 9) {
                             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                             StrictMode.setThreadPolicy(policy);
                         }
-                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
-                    }else{
-                        BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
-                        Bitmap b=bitmapDrawable.getBitmap();
-                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(url)));
+                    }else {
+                        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.logo);
+                        Bitmap b = bitmapDrawable.getBitmap();
+                        Bitmap smallMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
                         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
                     }
-                    mMap.addMarker(markerOptions);
-                }
-                LatLng now=new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
-
-                com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
-
-                circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
-                if(circlesize<100)
-                    circlesize=100;
-                mMap.addCircle(new CircleOptions()
-                        .center(position)
-                        .radius(circlesize)
-                        .fillColor(Color.parseColor("#50F08080"))); // in meters
-                if(!first){
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-                    first=true;
+                    m=mMap.addMarker(markerOptions);
+                    if(marker.size()>i+1)
+                        marker.set(i,m);
+                    else
+                        marker.add(m);
                 }
             }
         };
@@ -837,4 +906,5 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         }
         return false;
     }
+
 }
