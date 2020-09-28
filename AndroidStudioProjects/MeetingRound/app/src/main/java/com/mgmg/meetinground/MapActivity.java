@@ -102,7 +102,7 @@ import java.util.concurrent.ExecutionException;
 
 public class MapActivity  extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener
 {
-    private static int Investment=0;
+    private int Investment;
     private GpsTracker gpsTracker;
     private boolean GameStart=false,host;
     private String temploc,roomId,uid;
@@ -146,6 +146,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         roomId=intent.getStringExtra("roomId");
         uid=intent.getStringExtra("uid");
         database = FirebaseDatabase.getInstance().getReference();
+        Investment=0;
 
         if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()==null){
             container.removeAllViews();
