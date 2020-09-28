@@ -816,6 +816,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     Intent intent=new Intent(MapActivity.this,RecommendActivity.class);
                     intent.putExtra("lat",now.latitude);
                     intent.putExtra("lon",now.longitude);
+                    intent.putExtra("uid", uid);
                     startActivity(intent);
                 }
             });

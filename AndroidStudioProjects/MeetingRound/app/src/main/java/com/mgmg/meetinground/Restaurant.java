@@ -1,6 +1,9 @@
 package com.mgmg.meetinground;
 
-public class Restaurant {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Restaurant implements Parcelable {
     String id;
     String name;
     String tel;
@@ -44,6 +47,62 @@ public class Restaurant {
         this.agree = agree;
         this.disagree = disagree;
     }
+
+    protected Restaurant(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        tel = in.readString();
+        address = in.readString();
+        area = in.readString();
+        lat = in.readString();
+        lon = in.readString();
+        branch = in.readString();
+        bhour_list = in.createStringArray();
+        category_list = in.createStringArray();
+        menu_list = in.createStringArray();
+        review_list = in.createStringArray();
+        tags = in.createStringArray();
+        images = in.createStringArray();
+        agree = in.readInt();
+        disagree = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(tel);
+        dest.writeString(address);
+        dest.writeString(area);
+        dest.writeString(lat);
+        dest.writeString(lon);
+        dest.writeString(branch);
+        dest.writeStringArray(bhour_list);
+        dest.writeStringArray(category_list);
+        dest.writeStringArray(menu_list);
+        dest.writeStringArray(review_list);
+        dest.writeStringArray(tags);
+        dest.writeStringArray(images);
+        dest.writeInt(agree);
+        dest.writeInt(disagree);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Restaurant> CREATOR = new Creator<Restaurant>() {
+        @Override
+        public Restaurant createFromParcel(Parcel in) {
+            return new Restaurant(in);
+        }
+
+        @Override
+        public Restaurant[] newArray(int size) {
+            return new Restaurant[size];
+        }
+    };
 
     public String getId() {
         return id;
