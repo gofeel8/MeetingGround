@@ -16,9 +16,9 @@ public class RestInfo {
 	private String lat;
 	private String lon;
 	private String branch;
-	private List<Object> bhour_list;
-	private List<Object> category_list;
-	private List<Object> menu_list;
+	private List<String> bhour_list;
+	private List<String> category_list;
+	private List<String> menu_list;
 	private List<String> review_list;
 	private List<String> tags;
 	private List<String> images;

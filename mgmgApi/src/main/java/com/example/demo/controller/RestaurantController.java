@@ -94,9 +94,22 @@ public class RestaurantController {
 			r.setLat(el.getLatitude());
 			r.setLon(el.getLongitude());
 			r.setBranch(el.getBranch());
-			r.setBhour_list(el.getBhour_list());
-			r.setCategory_list(el.getCategory_list());
-			r.setMenu_list(el.getMenu_list());
+			List<String>categorys=new ArrayList<>();
+			for(Object o:el.getCategory_list()) {
+				Map map = new HashMap();
+				map = (Map) gson.fromJson(gson.toJson(o), map.getClass());					
+				String rv=map.get("category").toString();
+				if(rv.length()>0)categorys.add(rv);		
+			}
+			r.setCategory_list(categorys);
+			List<String>menu=new ArrayList<>();
+			for(Object o:el.getMenu_list()) {
+				Map map = new HashMap();
+				map = (Map) gson.fromJson(gson.toJson(o), map.getClass());					
+				String rv=map.get("menu").toString();
+				if(rv.length()>0)menu.add(rv);		
+			}
+			r.setMenu_list(menu);
 			List<String>reviews=new ArrayList<>();
 			for(Object o:el.getReview_list()) {
 				Map map = new HashMap();
