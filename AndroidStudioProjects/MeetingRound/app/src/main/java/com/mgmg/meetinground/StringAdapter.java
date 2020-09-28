@@ -8,33 +8,27 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.util.HashSet;
-import java.util.List;
-
 public class StringAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private List<String> list;
-    private int height, divider;
-    private HashSet<String> set;
+    private String[] keys;
+    private boolean[] checked;
 
-    public StringAdapter(Context context, List<String> list, int height, int divider, HashSet<String> set) {
+    public StringAdapter(Context context, String[] keys, boolean[] checked) {
         this.context = context;
-        this.list = list;
         this.layoutInflater = LayoutInflater.from(context);
-        this.height = height;
-        this.divider = divider;
-        this.set = set;
+        this.keys = keys;
+        this.checked = checked;
     }
 
     @Override
     public int getCount() {
-        return list.size();
+        return keys.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return list.get(position);
+        return keys[position];
     }
 
     @Override
@@ -47,10 +41,9 @@ public class StringAdapter extends BaseAdapter {
         View view = layoutInflater.inflate(R.layout.list_string, null);
 
         TextView tvString = view.findViewById(R.id.tvString);
-        tvString.setText(list.get(position));
-        tvString.setHeight(height / list.size() - divider);
+        tvString.setText(keys[position]);
 
-        if (set.contains(list.get(position))) {
+        if (checked[position]) {
             tvString.setTextColor(Color.BLUE);
         }
 
