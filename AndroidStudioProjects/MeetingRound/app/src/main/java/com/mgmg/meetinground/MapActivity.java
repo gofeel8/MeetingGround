@@ -114,6 +114,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     private Long meetingTime;
     private String address;
     private String api_key="AIzaSyAMy-qeSOF-mrR6_aLzMDGc9YgsW70UCfQ";
+    static boolean first=false;
     private LinearLayout container;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -167,7 +168,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        database.child("rooms").child(roomId).child("info").child("users").child(uid).addValueEventListener(new ValueEventListener(){
+        database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 LatLng now=new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
@@ -254,9 +255,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         return;
                     }
                     GameStart=true;
-                    if(GameStart)
-                        container.removeAllViews();
-
+                    container.removeAllViews();
                     // 2. 각자의 위치를 띄운다.
 //                    List<LatLng> position=new LinkedList<>();
                     List<LatLng> user_pos=new LinkedList<>();
@@ -730,17 +729,20 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
                 }
                 mMap.addMarker(markerOptions);
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(mine));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                if(!GameStart) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(mine));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                }
                 if(position==null)
                     return;
                 markerOptions.position(position);
                 markerOptions.title("meeting place");
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
                 mMap.addMarker(markerOptions);
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-
+                if(!GameStart) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                }
                 if(users==null) {
                     return;
                 }
@@ -770,14 +772,17 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
 
                 circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
-                if(circlesize>0) {
-                    mMap.addCircle(new CircleOptions()
-                            .center(position)
-                            .radius(circlesize)
-                            .fillColor(Color.parseColor("#50F08080"))); // in meters
+                if(circlesize<100)
+                    circlesize=100;
+                mMap.addCircle(new CircleOptions()
+                        .center(position)
+                        .radius(circlesize)
+                        .fillColor(Color.parseColor("#50F08080"))); // in meters
+                if(!first){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                    first=true;
                 }
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
             }
         };
         handler.post(run);
