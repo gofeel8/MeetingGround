@@ -103,6 +103,8 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:theme="@style/Widget.BottomNavigationView"
+        android:visibility="invisible"
         app:itemBackground="@color/colorMyTheme"
         app:itemHorizontalTranslationEnabled="false"
         app:itemIconTint="@drawable/item_color"
@@ -111,7 +113,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        android:theme="@style/Widget.BottomNavigationView"
         app:menu="@menu/menu_bottom" />
 
     <Button
