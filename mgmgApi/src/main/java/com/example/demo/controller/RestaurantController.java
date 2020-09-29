@@ -82,7 +82,7 @@ public class RestaurantController {
 		for(int i=0;i<len;i++) {
 			Simil el=csList.get(i);
 			if(Double.isNaN(el.getSimilarity())) {
-				NanList.add(el.getIdx());
+				//NanList.add(el.getIdx());
 			}else {
 				if(el.getSimilarity()>0.0) {
 					result.add(list.get(el.getIdx()));
