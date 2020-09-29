@@ -172,7 +172,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 ////            }
 ////        });
 
-
         database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
