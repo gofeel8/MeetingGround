@@ -117,9 +117,10 @@ public class RoomActivity extends AppCompatActivity {
                 if(calendar.before(Calendar.getInstance())){
                     Toast.makeText(RoomActivity.this, "지난 모임방에들어옴", Toast.LENGTH_SHORT).show();
 //                    bottomNavigation.setVisibility(View.INVISIBLE);
+
                     return;
                 }
-
+                    btnSend.setVisibility(View.VISIBLE);
                     bottomNavigation.setVisibility(View.VISIBLE);
 
                 //Receiver 설정
