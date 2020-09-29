@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -59,9 +60,21 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
 //            Toast.makeText(this, restaurant.getName(), Toast.LENGTH_SHORT).show();
             name.setText(restaurant.getName());
             if(restaurant.getTags() !=null){
-                tag.setText(restaurant.getTags().toString());
+                StringBuilder sb = new StringBuilder();
+
+
+                for (String str : restaurant.getTags()) {
+                    sb.append("#");
+                    sb.append(str);
+                    sb.append("  ");
+                }
+                tag.setText(sb.toString());
+
             }
 
+            if(restaurant.getImages().get(0) != null){
+                Glide.with(getApplicationContext()).load(restaurant.getImages().get(0)).into(imgView);
+            }
         }
 
         like.setOnClickListener(new View.OnClickListener() {

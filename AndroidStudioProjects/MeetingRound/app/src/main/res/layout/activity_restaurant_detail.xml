@@ -21,7 +21,9 @@
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="가게명"
-            android:textSize="20sp" />
+            android:textColor="@color/colorBlack"
+            android:fontFamily="@font/bmjua_ttf"
+            android:textSize="20sp"/>
 
         <TextView
             android:id="@+id/tv_tag"
@@ -30,6 +32,8 @@
             android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="태그"
+            android:textColor="@color/colorBlack"
+            android:fontFamily="@font/bmjua_ttf"
             android:textSize="20sp" />
 
         <ImageView
@@ -37,7 +41,8 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="20dp"
-            app:srcCompat="@drawable/logo" />
+            app:srcCompat="@drawable/logo"
+            android:adjustViewBounds="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -71,7 +76,11 @@
             android:id="@+id/btn_like"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_weight="1"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="#8bb8d9"
             android:clickable="true"
             android:focusable="true"
             app:srcCompat="@drawable/like" />
@@ -80,7 +89,11 @@
             android:id="@+id/btn_hate"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_weight="1"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="#f28383"
             android:clickable="true"
             android:focusable="true"
             app:srcCompat="@drawable/hate" />
