@@ -4,8 +4,11 @@ import java.util.ArrayList;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Circle;
@@ -89,6 +92,7 @@ public class RestaurantController {
 		}
 		for(int idx1:NanList)result.add(list.get(idx1));
 		ArrayList<RestInfo>res=new ArrayList<>();
+		Set<String>set=new HashSet<>();
 		for(Restaurant el:result) {
 			//System.out.println("분석결과:"+el);
 			RestInfo r=new RestInfo();
@@ -105,7 +109,8 @@ public class RestaurantController {
 				Map map = new HashMap();
 				map = (Map) gson.fromJson(gson.toJson(o), map.getClass());					
 				String rv=map.get("category").toString();
-				if(rv.length()>0)categorys.add(rv);		
+				if(rv.length()>0)categorys.add(rv);	
+				set.add(rv);
 			}
 			r.setCategory_list(categorys);
 			List<String>menu=new ArrayList<>();
@@ -113,7 +118,8 @@ public class RestaurantController {
 				Map map = new HashMap();
 				map = (Map) gson.fromJson(gson.toJson(o), map.getClass());					
 				String rv=map.get("menu").toString();
-				if(rv.length()>0)menu.add(rv);		
+				if(rv.length()>0)menu.add(rv);
+				set.add(rv);
 			}
 			r.setMenu_list(menu);
 			List<String>reviews=new ArrayList<>();
@@ -128,7 +134,11 @@ public class RestaurantController {
 			List<Integer> arr=el.getTags();
 			List<String>tags=new ArrayList<>();			
 			for(int i=0;i<arr.size();i++)if(arr.get(i)==1)tags.add(tagArr.getTagsArr()[i]);			
-			
+			Iterator iter=set.iterator();
+			while (iter.hasNext()) {
+				tags.add(iter.next().toString());				
+			}
+			System.out.println(tags.toString());
 			r.setTags(tags);
 			r.setImages(el.getImages());
 			res.add(r);
