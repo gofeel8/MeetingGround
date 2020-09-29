@@ -95,6 +95,7 @@ public class RestaurantController {
 		Set<String>set=new HashSet<>();
 		for(Restaurant el:result) {
 			//System.out.println("분석결과:"+el);
+			set.clear();
 			RestInfo r=new RestInfo();
 			r.setId(el.getId().toHexString());
 			r.setName(el.getName());
