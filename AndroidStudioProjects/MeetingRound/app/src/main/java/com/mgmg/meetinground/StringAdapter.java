@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 public class StringAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
@@ -44,7 +46,9 @@ public class StringAdapter extends BaseAdapter {
         tvString.setText(keys[position]);
 
         if (checked[position]) {
-            tvString.setTextColor(Color.BLUE);
+            int myColor = ContextCompat.getColor(context,R.color.colorMyTheme);
+            tvString.setTextColor(myColor);
+            tvString.getPaint().setUnderlineText(true);
         }
 
         return view;
