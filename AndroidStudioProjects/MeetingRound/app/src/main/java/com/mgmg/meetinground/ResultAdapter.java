@@ -40,9 +40,11 @@ public class ResultAdapter extends BaseAdapter {
         View view = layoutInflater.inflate(R.layout.list_result, null);
 
         TextView tvResultName = view.findViewById(R.id.tvResultName);
+        TextView tvResultAddress = view.findViewById(R.id.tvResultAddress);
         TextView tvResultTag = view.findViewById(R.id.tvRtag);
 
         tvResultName.setText(list.get(position).getName());
+        tvResultAddress.setText(list.get(position).getAddress());
 
         StringBuilder sb = new StringBuilder();
 
