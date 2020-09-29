@@ -14,6 +14,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -73,14 +74,21 @@ public class MakeActivity extends AppCompatActivity {
         btnMakeRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Calendar nowTime =  Calendar.getInstance();
+
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(y, m, d, hrs, min,0);
 
-                Intent intent = new Intent();
-                intent.putExtra("roomName", etName.getText().toString());
-                intent.putExtra("timestamp", calendar.getTimeInMillis());
-                setResult(RESULT_OK, intent);
-                finish();
+                if(calendar.before(nowTime)){
+                    Toast.makeText(MakeActivity.this, "시간을 확인해주세요", Toast.LENGTH_SHORT).show();
+                }else{
+                    Intent intent = new Intent();
+                    intent.putExtra("roomName", etName.getText().toString());
+                    intent.putExtra("timestamp", calendar.getTimeInMillis());
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+
             }
         });
     }
