@@ -61,7 +61,7 @@ public class RecommendActivity extends AppCompatActivity {
         lvResult.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent();
+                Intent intent = new Intent(getApplicationContext(), RestaurantDetail.class);
                 intent.putExtra("obj", restaurants.get(position));
                 intent.putExtra("uid", uid);
                 startActivity(intent);
