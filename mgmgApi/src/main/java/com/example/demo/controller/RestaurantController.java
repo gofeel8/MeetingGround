@@ -76,12 +76,18 @@ public class RestaurantController {
 		}
 		csList.sort(Comparator.comparing(Simil::getSimilarity).reversed());
 		int len=csList.size();
-		len=len>10?10:len;
+		len=len>20?20:len;
 		List<Restaurant>result=new ArrayList<>();
+		List<Integer>NanList=new ArrayList<>();
 		for(int i=0;i<len;i++) {
 			Simil el=csList.get(i);
-			result.add(list.get(el.getIdx()));
+			if(Double.isNaN(el.getSimilarity())) {
+				NanList.add(el.getIdx());
+			}else {
+				result.add(list.get(el.getIdx()));
+			}			
 		}
+		for(int idx1:NanList)result.add(list.get(idx1));
 		ArrayList<RestInfo>res=new ArrayList<>();
 		for(Restaurant el:result) {
 			//System.out.println("분석결과:"+el);
@@ -129,7 +135,7 @@ public class RestaurantController {
 		}
 		Map<String,Object>map=new HashMap<>();
 		map.put("result", res);
-		System.out.println(gson.toJson(map));
+		//System.out.println(gson.toJson(map));
     	return gson.toJson(map);
     }
 }
