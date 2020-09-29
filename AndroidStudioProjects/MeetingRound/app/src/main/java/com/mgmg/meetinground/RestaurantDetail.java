@@ -108,5 +108,6 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
         database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("lat").setValue(restaurant.getLat());
         database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("lon").setValue(restaurant.getLon());
         database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("tags").setValue(restaurant.getTags());
+        database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("images").setValue(restaurant.getImages());
     }
 }
