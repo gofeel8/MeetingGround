@@ -18,6 +18,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Arrays;
+
 public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCallback {
     private DatabaseReference database;
     private GoogleMap mMap;
@@ -50,26 +52,13 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
 
 
         if(restaurant != null){
-            Toast.makeText(this, restaurant.getName(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, restaurant.getName(), Toast.LENGTH_SHORT).show();
             name.setText(restaurant.getName());
             if(restaurant.getTags() !=null){
-                tag.setText(restaurant.getTags().toString());
+                tag.setText(Arrays.toString(restaurant.getTags()));
             }
-            LatLng rest = new LatLng(Double.parseDouble(restaurant.getLat()), 	Double.parseDouble(restaurant.getLon()));
-            mMap.addMarker(new MarkerOptions()
-                    .position(rest)
-                    .title(restaurant.getName()));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(rest));
-        }else{
-            Toast.makeText(this,"레스토랑이비었습니다", Toast.LENGTH_SHORT).show();
+
         }
-
-
-
-
-
-
-
 
 
     }
@@ -77,13 +66,13 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-
-        LatLng rest = new LatLng(37.413294, 	126.734086);
-//        mMap.addMarker(new MarkerOptions()
-//                .position(rest)
-//                .title("Marker in Sydney"));
+        Toast.makeText(this, "Lat :" + Double.parseDouble(restaurant.getLat()), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Lon :" + Double.parseDouble(restaurant.getLon()), Toast.LENGTH_SHORT).show();
+        LatLng rest = new LatLng(Double.parseDouble(restaurant.getLat()),Double.parseDouble(restaurant.getLon()));
+        mMap.addMarker(new MarkerOptions()
+                .position(rest)
+                .title(restaurant.getName()));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(rest));
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(17));
     }
 }
