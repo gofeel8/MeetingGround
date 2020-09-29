@@ -65,6 +65,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
@@ -121,7 +123,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     private LinearLayout container;
     private List<Marker> marker;
     Marker clickposition;
-    Circle magneticCircle;
+    Polygon magneticCircle;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -210,10 +212,12 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
                 if(circlesize<100)
                     circlesize=100;
-                magneticCircle = mMap.addCircle(new CircleOptions()
-                        .center(position)
-                        .radius(circlesize)
-                        .fillColor(Color.parseColor("#50F08080"))); // in meters
+                PolygonOptions polygonOptions = createPolygonWithCircle(MapActivity.this,position,circlesize);
+                magneticCircle = mMap.addPolygon(polygonOptions);
+//                magneticCircle = mMap.addCircle(new CircleOptions()
+//                        .center(position)
+//                        .radius(circlesize)
+//                        .fillColor(Color.parseColor("#50F08080"))); // in meters
 
 
                 if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
@@ -829,7 +833,49 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
         return Bitmap.createScaledBitmap(source, newWidth, newHeight, true);
     }
+    //
+    private static List<LatLng> createOuterBounds() {
+        float delta = 0.01f;
 
+        return new ArrayList<LatLng>() {{
+            add(new LatLng(90 - delta, -180 + delta));
+            add(new LatLng(0, -180 + delta));
+            add(new LatLng(-90 + delta, -180 + delta));
+            add(new LatLng(-90 + delta, 0));
+            add(new LatLng(-90 + delta, 180 - delta));
+            add(new LatLng(0, 180 - delta));
+            add(new LatLng(90 - delta, 180 - delta));
+            add(new LatLng(90 - delta, 0));
+            add(new LatLng(90 - delta, -180 + delta));
+        }};
+    }
+    private static Iterable<LatLng> createHole(LatLng center, int radius) {
+        int points = 50; // number of corners of inscribed polygon
+
+        double radiusLatitude = Math.toDegrees(radius / (float) 6371000);
+        double radiusLongitude = radiusLatitude / Math.cos(Math.toRadians(center.latitude));
+
+        List<LatLng> result = new ArrayList<>(points);
+
+        double anglePerCircleRegion = 2 * Math.PI / points;
+
+        for (int i = 0; i < points; i++) {
+            double theta = i * anglePerCircleRegion;
+            double latitude = center.latitude + (radiusLatitude * Math.sin(theta));
+            double longitude = center.longitude + (radiusLongitude * Math.cos(theta));
+
+            result.add(new LatLng(latitude, longitude));
+        }
+        return result;
+    }
+    static PolygonOptions createPolygonWithCircle(Context context, LatLng center, int radius) {
+        return new PolygonOptions()
+                .fillColor(Color.parseColor("#50F08080"))
+                .addAll(createOuterBounds())
+                .addHole(createHole(center, radius))
+                .strokeWidth(0);
+    }
+    //
     public void magnetic_field(final List<LatLng> users, final List<String> profile, final List<String> name, final boolean GameStart){
         handler.removeCallbacks(run);
         run=new Runnable() {
@@ -877,10 +923,12 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     circlesize = (int) (meetingTime - System.currentTimeMillis()) / 10;
                     if (circlesize < 100)
                         circlesize = 100;
-                    mMap.addCircle(new CircleOptions()
-                            .center(position)
-                            .radius(circlesize)
-                            .fillColor(Color.parseColor("#50F08080"))); // in meters
+                    PolygonOptions polygonOptions = createPolygonWithCircle(MapActivity.this,position,circlesize);
+                    magneticCircle = mMap.addPolygon(polygonOptions);
+//                    mMap.addCircle(new CircleOptions()
+//                            .center(position)
+//                            .radius(circlesize)
+//                            .fillColor(Color.parseColor("#50F08080"))); // in meters
                 }
                 for(int i=0;i<users.size();i++){
                     Marker m;
