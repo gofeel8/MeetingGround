@@ -48,17 +48,12 @@ public class ResultAdapter extends BaseAdapter {
 
         StringBuilder sb = new StringBuilder();
 
-        for (String c : list.get(position).getCategory_list()) {
-            sb.append("#");
-            sb.append(c);
-            sb.append("  ");
-        }
-
         for (String tag : list.get(position).getTags()) {
             sb.append("#");
             sb.append(tag);
             sb.append("  ");
         }
+
 
         tvResultTag.setText(sb.toString());
 
