@@ -13,29 +13,29 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.List;
 
 public class VoteActivity extends AppCompatActivity {
     VoteAdapter adapter;
+    private DatabaseReference database;
+    String roomId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vote);
 
+        database = FirebaseDatabase.getInstance().getReference();
         RecyclerView recyclerView = findViewById(R.id.recycleView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager( layoutManager);
 
         adapter = new VoteAdapter();
-
-        adapter.addItem(new Restaurant());
-        adapter.addItem(new Restaurant());
-        adapter.addItem(new Restaurant());
-        adapter.addItem(new Restaurant());
-        adapter.addItem(new Restaurant());
-        adapter.addItem(new Restaurant());
-        adapter.addItem(new Restaurant());
-        adapter.addItem(new Restaurant());
-
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(new OnRestaurantClickListener() {
@@ -85,6 +85,43 @@ public class VoteActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        roomId = intent.getStringExtra("roomId");
+        database.child("rooms").child(roomId).child("vote").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                adapter.items.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Restaurant r = new Restaurant();
+                    r.setId(ds.getKey());
+                    r.setName((String) ds.child("info").child("name").getValue());
+                    r.setAddress((String) ds.child("info").child("address").getValue());
+                    r.setArea((String) ds.child("info").child("area").getValue());
+                    r.setTel((String) ds.child("info").child("tel").getValue());
+                    r.setLat((String) ds.child("info").child("lat").getValue());
+                    r.setLon((String) ds.child("info").child("lon").getValue());
+                    r.setTags((List<String>) ds.child("info").child("tags").getValue());
+                    r.setImages((List<String>) ds.child("info").child("images").getValue());
+                    int agree=0, disagree=0;
+                    for (DataSnapshot d : ds.child("vote").getChildren()) {
+                        if ((boolean) d.getValue())
+                            agree++;
+                        else
+                            disagree++;
+                    }
+                    r.setAgree(agree);
+                    r.setDisagree(disagree);
+                    adapter.addItem(r);
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     @Override

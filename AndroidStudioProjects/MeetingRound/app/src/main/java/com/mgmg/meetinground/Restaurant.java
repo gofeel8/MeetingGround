@@ -3,6 +3,7 @@ package com.mgmg.meetinground;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Restaurant implements Parcelable {
@@ -232,5 +233,27 @@ public class Restaurant implements Parcelable {
 
     public void setDisagree(int disagree) {
         this.disagree = disagree;
+    }
+
+    @Override
+    public String toString() {
+        return "Restaurant{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", tel='" + tel + '\'' +
+                ", address='" + address + '\'' +
+                ", area='" + area + '\'' +
+                ", lat='" + lat + '\'' +
+                ", lon='" + lon + '\'' +
+                ", branch='" + branch + '\'' +
+                ", bhour_list=" + Arrays.toString(bhour_list) +
+                ", category_list=" + Arrays.toString(category_list) +
+                ", menu_list=" + Arrays.toString(menu_list) +
+                ", review_list=" + Arrays.toString(review_list) +
+                ", tags=" + tags +
+                ", images=" + images +
+                ", agree=" + agree +
+                ", disagree=" + disagree +
+                '}';
     }
 }
