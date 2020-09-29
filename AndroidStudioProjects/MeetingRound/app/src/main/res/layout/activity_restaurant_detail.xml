@@ -7,100 +7,97 @@
     android:background="@color/colorMyTheme"
     tools:context=".RestaurantDetail">
 
-    <ScrollView
-        android:id="@+id/scroll"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="가게명"
+            android:textColor="@color/colorBlack"
+            android:fontFamily="@font/bmjua_ttf"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/tv_tag"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/bmjua_ttf"
+            android:gravity="center"
+            android:text="태그"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/RestIMG"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="20dp"
+            android:adjustViewBounds="true"
+            app:srcCompat="@drawable/logo" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/top"
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:layout_margin="20dp"
+                tools:context=".MapsActivity" />
 
-                <TextView
-                    android:id="@+id/tv_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/bmjua_ttf"
-                    android:gravity="center"
-                    android:text="가게명"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/tv_tag"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/bmjua_ttf"
-                    android:gravity="center"
-                    android:text="태그"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="20sp" />
-
-                <ImageView
-                    android:id="@+id/RestIMG"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginTop="20dp"
-                    android:adjustViewBounds="true"
-                    app:srcCompat="@drawable/logo" />
-
-                <fragment
-                    android:id="@+id/map"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_margin="20dp"
-                    tools:context=".MapsActivity" />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/bottom"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                app:layout_constraintHorizontal_bias="0.0">
-
-                <ImageView
-                    android:id="@+id/btn_like"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/custom_button"
-                    android:backgroundTint="#8bb8d9"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:srcCompat="@drawable/like" />
-
-                <ImageView
-                    android:id="@+id/btn_hate"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/custom_button"
-                    android:backgroundTint="#f28383"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:srcCompat="@drawable/hate" />
-
-            </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/btn_like"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="#8bb8d9"
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/like" />
+
+        <ImageView
+            android:id="@+id/btn_hate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="#f28383"
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/hate" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
