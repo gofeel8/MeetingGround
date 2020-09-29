@@ -175,6 +175,12 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 ////                startActivityForResult(intent,100);
 ////            }
 ////        });
+        editText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                editText.setText("");
+            }
+        });
         database.child("rooms").child(roomId).child("investment").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -353,8 +359,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
                 String str=editText.getText().toString();
 
-                editText.setText("");
-
                 gpsTracker = new GpsTracker(MapActivity.this);
                 String myurl=getIntent().getStringExtra("profile");
 
@@ -394,9 +398,10 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         MarkerOptions markerOptions1=new MarkerOptions();
                         markerOptions1.title("click");
                         markerOptions1.position(position);
-                        BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click);
+
+                        BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click2);
                         Bitmap b=bitmapDrawable.getBitmap();
-                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
                         markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
                         mMap.addMarker(markerOptions1);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
@@ -699,10 +704,23 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     MarkerOptions markerOptions1=new MarkerOptions();
                     markerOptions1.title("click");
                     markerOptions1.position(latLng);
-                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click);
+                    Geocoder geocoder=new Geocoder(getBaseContext());
+                    try{
+                        List<Address> addresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude,1);
+                        String []splitStr=addresses.get(0).toString().split(",");
+                        address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
+                                splitStr[0].length()-2); // 주소 parsing
+                        editText.requestFocus();
+                        editText.setText(address);
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
+                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click2);
                     Bitmap b=bitmapDrawable.getBitmap();
-                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                    // Return the circular bitmap
+                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
                     markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+//                    markerOptions1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                     clickposition=mMap.addMarker(markerOptions1);
                 }
             }
