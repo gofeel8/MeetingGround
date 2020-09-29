@@ -60,6 +60,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -101,6 +102,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.concurrent.ExecutionException;
 
+
 public class MapActivity  extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener
 {
     private int Investment;
@@ -118,6 +120,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     static boolean first=false;
     private LinearLayout container;
     private List<Marker> marker;
+    Marker clickposition;
+    Circle magneticCircle;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -200,15 +204,11 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
                 if(circlesize<100)
                     circlesize=100;
-                mMap.addCircle(new CircleOptions()
+                magneticCircle = mMap.addCircle(new CircleOptions()
                         .center(position)
                         .radius(circlesize)
                         .fillColor(Color.parseColor("#50F08080"))); // in meters
-                if(!first){
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-                    first=true;
-                }
+
 
                 if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
                     NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -643,6 +643,28 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        gpsTracker = new GpsTracker(MapActivity.this);
+        String myurl=getIntent().getStringExtra("profile");
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+        markerOptions.position(mine);
+        markerOptions.title("mine");
+        if(!myurl.equals("")) {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+        }else{
+            BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
+            Bitmap b=bitmapDrawable.getBitmap();
+            Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
+        }
+        mMap.addMarker(markerOptions);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(mine));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -681,8 +703,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     Bitmap b=bitmapDrawable.getBitmap();
                     Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
                     markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-                    mMap.addMarker(markerOptions1);
-
+                    clickposition=mMap.addMarker(markerOptions1);
                 }
             }
         });
@@ -822,10 +843,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
                     }
                     mMap.addMarker(markerOptions);
-                    if(!GameStart) {
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(mine));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-                    }
                 }
                 if(position==null)
                     return;
@@ -833,12 +850,19 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 markerOptions.title("meeting place");
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
                 mMap.addMarker(markerOptions);
-                if(!GameStart) {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-                }
                 if(users==null) {
                     return;
+                }
+                if(magneticCircle==null) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+                    circlesize = (int) (meetingTime - System.currentTimeMillis()) / 10;
+                    if (circlesize < 100)
+                        circlesize = 100;
+                    mMap.addCircle(new CircleOptions()
+                            .center(position)
+                            .radius(circlesize)
+                            .fillColor(Color.parseColor("#50F08080"))); // in meters
                 }
                 for(int i=0;i<users.size();i++){
                     Marker m;
@@ -912,6 +936,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         String roomId = intent.getStringExtra("roomId");
 
                         database.child("rooms").child(roomId).child("info").child("settings").child("address").setValue(address);
+                        if(clickposition!=null)
+                            clickposition.remove();
                     }
                 });
             }
