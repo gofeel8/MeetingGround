@@ -95,6 +95,8 @@ public class RoomActivity extends AppCompatActivity {
          calendar = Calendar.getInstance();
 
 
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+
         //방에들어오면 알람이 설정된다. 동일한 이름의 PendingIntent는 덮어쓰여지는것으로 알고있음
         database.child("rooms").child(roomId).child("info").child("settings").child("time").addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
@@ -114,8 +116,12 @@ public class RoomActivity extends AppCompatActivity {
 
                 if(calendar.before(Calendar.getInstance())){
                     Toast.makeText(RoomActivity.this, "지난 모임방에들어옴", Toast.LENGTH_SHORT).show();
+//                    bottomNavigation.setVisibility(View.INVISIBLE);
+
                     return;
                 }
+                    btnSend.setVisibility(View.VISIBLE);
+                    bottomNavigation.setVisibility(View.VISIBLE);
 
                 //Receiver 설정
                 Intent intent = new Intent(RoomActivity.this,AlarmReceiver.class);
@@ -282,7 +288,6 @@ public class RoomActivity extends AppCompatActivity {
         });
 
 
-        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         bottomNavigation.setSelectedItemId(R.id.tab1);
         bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 
