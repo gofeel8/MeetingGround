@@ -121,14 +121,18 @@ public class RestaurantController {
 			r.setReview_list(reviews);
 			List<Integer> arr=el.getTags();
 			List<String>tags=new ArrayList<>();
-			for(int i=0;i<arr.size();i++)if(arr.get(i)==1)tags.add(tagArr.getTagsArr()[i]);
+			if(arr!=null) {
+				System.out.println(arr.toString());
+				for(int i=0;i<arr.size();i++)if(arr.get(i)==1)tags.add(tagArr.getTagsArr()[i]);
+			}
+			
 			r.setTags(tags);
 			r.setImages(el.getImages());
 			res.add(r);
 		}
 		Map<String,Object>map=new HashMap<>();
 		map.put("result", res);
-		System.out.println(gson.toJson(map));
+		//System.out.println(gson.toJson(map));
     	return gson.toJson(map);
     }
 }
