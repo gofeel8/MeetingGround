@@ -152,20 +152,22 @@ public class RoomActivity extends AppCompatActivity {
         database.child("rooms").child(roomId).child("info").child("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 list.clear();
                 boolean hasHost = false;
                 for (DataSnapshot ds : snapshot.getChildren()) {
+                    String uId =ds.getKey();
                     String uName = (String) ds.child("name").getValue();
                     String uProfile = (String) ds.child("profile").getValue();
                     boolean isHost = false;
                     if (ds.child("host").getValue() != null)
                         isHost = true;
                     if (isHost) {
-                        list.add(0, new UserDto(uName, uProfile));
+                        list.add(0, new UserDto(uName, uProfile,uId));
                         hasHost = true;
                     }
                     else {
-                        list.add(new UserDto(uName, uProfile));
+                        list.add(new UserDto(uName, uProfile,uId));
                     }
                 }
 
@@ -187,6 +189,29 @@ public class RoomActivity extends AppCompatActivity {
 
             }
         });
+
+        database.child("rooms").child(roomId).child("investment").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Log.d("gps2","id : "+ds.getKey() +", value : "+ds.getValue());
+                    for(int i=0;i<list.size();i++){
+                        if(list.get(i).getuId().equals(ds.getKey())){
+                            list.get(i).setInvest( (int) (long) ds.getValue());
+                            userAdapter.notifyDataSetChanged();
+                            break;
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
 //        btnRecommend.setOnClickListener(new View.OnClickListener() {
 //            @Override

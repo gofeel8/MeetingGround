@@ -4,17 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +31,7 @@ public class RecommendActivity extends AppCompatActivity {
     List<Restaurant> restaurants;
     double lat, lon;
     String uid;
+    JSONArray tmp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,28 +51,7 @@ public class RecommendActivity extends AppCompatActivity {
         lvKey.setAdapter(keyAdapter);
         lvKey.setOnItemClickListener((parent, view, position, id) -> {
             checked[position] = !checked[position];
-
-            try {
-                // 아이템이 클릭될 때마다 비동기 요청 전송
-                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                String url = "http://j3b207.p.ssafy.io:8080/api/search";
-                JSONObject obj = new JSONObject();
-                obj.put("lat", lat);
-                obj.put("lon", lon);
-                JSONArray arr = new JSONArray(checked);
-                obj.put("keys", arr);
-
-                // Add the request to the RequestQueue.
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, obj, response -> {
-                    System.out.println(response);
-                    resultAdapter.notifyDataSetChanged();
-                }, error -> error.printStackTrace());
-                queue.add(jsonObjectRequest);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
+            post();
             keyAdapter.notifyDataSetChanged();
         });
 
@@ -82,11 +61,46 @@ public class RecommendActivity extends AppCompatActivity {
         lvResult.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent();
+                Intent intent = new Intent(getApplicationContext(), RestaurantDetail.class);
                 intent.putExtra("obj", restaurants.get(position));
                 intent.putExtra("uid", uid);
                 startActivity(intent);
             }
         });
+
+        // 최초 1회 실행
+        post();
+    }
+
+    public void post() {
+        try {
+            // 아이템이 클릭될 때마다 비동기 요청 전송
+            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+            String url = "http://j3b207.p.ssafy.io:8080/api/search";
+            JSONObject obj = new JSONObject();
+            obj.put("lon", lat);
+            obj.put("lat", lon);
+            JSONArray arr = new JSONArray(checked);
+            obj.put("keys", arr);
+
+            // Add the request to the RequestQueue.
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, obj, response -> {
+                try {
+                    restaurants.clear();
+                    tmp = response.getJSONArray("result");
+                    for (int i = 0; i < tmp.length(); i++) {
+                        restaurants.add(new Gson().fromJson(tmp.getJSONObject(i).toString(), Restaurant.class));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                resultAdapter.notifyDataSetChanged();
+            }, error -> error.printStackTrace());
+
+            queue.add(jsonObjectRequest);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

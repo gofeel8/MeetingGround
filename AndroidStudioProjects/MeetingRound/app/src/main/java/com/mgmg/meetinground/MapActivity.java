@@ -148,7 +148,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         roomId=intent.getStringExtra("roomId");
         uid=intent.getStringExtra("uid");
         database = FirebaseDatabase.getInstance().getReference();
-        Investment=0;
+//        Investment=0;
         marker=new LinkedList<>();
 
         if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()==null){
@@ -158,7 +158,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         editText=(EditText)findViewById(R.id.editText);
         Places.initialize(getApplicationContext(),api_key);
         magnetic_field(null,null,null,false);
- //       editText.setFocusable(false);
+        //       editText.setFocusable(false);
 //        editText.setOnClickListener(new View.OnClickListener(){
 ////
 ////            @Override
@@ -171,6 +171,21 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 ////                startActivityForResult(intent,100);
 ////            }
 ////        });
+        database.child("rooms").child(roomId).child("investment").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue() != null) {
+                    Investment = (int) (long) snapshot.getValue();
+                }else{
+                    Investment = 0;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
             @Override
@@ -370,21 +385,21 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     if(addresses.size()==0){
                         Toast.makeText(MapActivity.this,"조금 더 정확한 명칭을 넣어주세요.",Toast.LENGTH_SHORT).show();
                     }else{
-                    String []splitStr=addresses.get(0).toString().split(",");
-                    String address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
-                            splitStr[0].length()-2); // 주소 parsing
-                    String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
-                    String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
-                    position = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
-                    MarkerOptions markerOptions1=new MarkerOptions();
-                    markerOptions1.title("click");
-                    markerOptions1.position(position);
-                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click);
-                    Bitmap b=bitmapDrawable.getBitmap();
-                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
-                    markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-                    mMap.addMarker(markerOptions1);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                        String []splitStr=addresses.get(0).toString().split(",");
+                        String address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
+                                splitStr[0].length()-2); // 주소 parsing
+                        String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
+                        String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
+                        position = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
+                        MarkerOptions markerOptions1=new MarkerOptions();
+                        markerOptions1.title("click");
+                        markerOptions1.position(position);
+                        BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click);
+                        Bitmap b=bitmapDrawable.getBitmap();
+                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                        markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+                        mMap.addMarker(markerOptions1);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

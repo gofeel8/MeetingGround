@@ -45,6 +45,13 @@ public class ResultAdapter extends BaseAdapter {
         tvResultName.setText(list.get(position).getName());
 
         StringBuilder sb = new StringBuilder();
+
+        for (String c : list.get(position).getCategory_list()) {
+            sb.append("#");
+            sb.append(c);
+            sb.append("  ");
+        }
+
         for (String tag : list.get(position).getTags()) {
             sb.append("#");
             sb.append(tag);
