@@ -3,6 +3,8 @@ package com.mgmg.meetinground;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 public class Restaurant implements Parcelable {
     String id;
     String name;
@@ -16,8 +18,8 @@ public class Restaurant implements Parcelable {
     String[] category_list;
     String[] menu_list;
     String[] review_list;
-    String[] tags;
-    String[] images;
+    List<String> tags;
+    List<String> images;
 
     int agree;
     int disagree;
@@ -29,7 +31,7 @@ public class Restaurant implements Parcelable {
         disagree=0;
     }
 
-    public Restaurant(String id, String name, String tel, String address, String area, String lat, String lon, String branch, String[] bhour_list, String[] category_list, String[] menu_list, String[] review_list, String[] tags, String[] images, int agree, int disagree) {
+    public Restaurant(String id, String name, String tel, String address, String area, String lat, String lon, String branch, String[] bhour_list, String[] category_list, String[] menu_list, String[] review_list, List<String> tags, List<String> images, int agree, int disagree) {
         this.id = id;
         this.name = name;
         this.tel = tel;
@@ -61,8 +63,8 @@ public class Restaurant implements Parcelable {
         category_list = in.createStringArray();
         menu_list = in.createStringArray();
         review_list = in.createStringArray();
-        tags = in.createStringArray();
-        images = in.createStringArray();
+        tags = in.createStringArrayList();
+        images = in.createStringArrayList();
         agree = in.readInt();
         disagree = in.readInt();
     }
@@ -81,8 +83,8 @@ public class Restaurant implements Parcelable {
         dest.writeStringArray(category_list);
         dest.writeStringArray(menu_list);
         dest.writeStringArray(review_list);
-        dest.writeStringArray(tags);
-        dest.writeStringArray(images);
+        dest.writeStringList(tags);
+        dest.writeStringList(images);
         dest.writeInt(agree);
         dest.writeInt(disagree);
     }
@@ -200,19 +202,19 @@ public class Restaurant implements Parcelable {
         this.review_list = review_list;
     }
 
-    public String[] getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(String[] tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 
-    public String[] getImages() {
+    public List<String> getImages() {
         return images;
     }
 
-    public void setImages(String[] images) {
+    public void setImages(List<String> images) {
         this.images = images;
     }
 

@@ -25,6 +25,7 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
     private DatabaseReference database;
     private GoogleMap mMap;
     Restaurant restaurant;
+    String roomId, uid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,13 +51,15 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
         restaurant = null;
         Intent intent=getIntent();
         restaurant =  (Restaurant) intent.getParcelableExtra("obj");
+        roomId = intent.getStringExtra("roomId");
+        uid = intent.getStringExtra("uid");
 
 
         if(restaurant != null){
 //            Toast.makeText(this, restaurant.getName(), Toast.LENGTH_SHORT).show();
             name.setText(restaurant.getName());
             if(restaurant.getTags() !=null){
-                tag.setText(Arrays.toString(restaurant.getTags()));
+                tag.setText(restaurant.getTags().toString());
             }
 
         }
@@ -65,6 +68,9 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onClick(View v) {
                 Toast.makeText(RestaurantDetail.this, "좋아요", Toast.LENGTH_SHORT).show();
+
+                database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("vote").child(uid).setValue(true);
+                add(restaurant);
             }
         });
 
@@ -72,6 +78,9 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onClick(View v) {
                 Toast.makeText(RestaurantDetail.this, "싫어요", Toast.LENGTH_SHORT).show();
+
+                database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("vote").child(uid).setValue(false);
+                add(restaurant);
             }
         });
 
@@ -89,5 +98,15 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
                 .title(restaurant.getName()));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(rest));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(17));
+    }
+
+    public void add(Restaurant restaurant) {
+        database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("name").setValue(restaurant.getName());
+        database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("tel").setValue(restaurant.getTel());
+        database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("address").setValue(restaurant.getAddress());
+        database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("area").setValue(restaurant.getArea());
+        database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("lat").setValue(restaurant.getLat());
+        database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("lon").setValue(restaurant.getLon());
+        database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("info").child("tags").setValue(restaurant.getTags());
     }
 }

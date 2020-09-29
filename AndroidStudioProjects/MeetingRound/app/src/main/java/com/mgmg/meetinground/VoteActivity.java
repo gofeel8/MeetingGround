@@ -45,6 +45,7 @@ public class VoteActivity extends AppCompatActivity {
 //                Toast.makeText(VoteActivity.this, "아이템 선택됨 : "+item.getName(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), RestaurantDetail.class);
                 intent.putExtra("obj",item);
+                intent.putExtras(getIntent());
                 startActivity(intent);
             }
         });
