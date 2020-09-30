@@ -114,8 +114,16 @@ public class RoomActivity extends AppCompatActivity {
                 SimpleDateFormat format = new SimpleDateFormat("MM월dd일 HH시mm분", Locale.getDefault());
                 tvRoomTime.setText(format.format(calendar.getTime()));
 
-                if(calendar.before(Calendar.getInstance())){
-                    Toast.makeText(RoomActivity.this, "지난 모임방에들어옴", Toast.LENGTH_SHORT).show();
+                long finishtime = 30; // 모임시간 finishtime분후 종료
+
+                    Calendar EndTime = Calendar.getInstance();
+                    EndTime.setTimeInMillis(meetingTime+(finishtime*60*1000));
+
+
+
+
+                    if(EndTime.before(Calendar.getInstance())){
+//                    Toast.makeText(RoomActivity.this, "지난 모임방에들어옴", Toast.LENGTH_SHORT).show();
 //                    bottomNavigation.setVisibility(View.INVISIBLE);
 
                     return;
@@ -132,7 +140,7 @@ public class RoomActivity extends AppCompatActivity {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(RoomActivity.this,_id,intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
                 //.알람 설정
-                long startMinutes = 1;
+                long startMinutes = 30;
                 Calendar startTime = Calendar.getInstance();
                 startTime.setTimeInMillis(calendar.getTimeInMillis()-(startMinutes*60*1000));
 
@@ -141,7 +149,7 @@ public class RoomActivity extends AppCompatActivity {
                 alarmManager.set(AlarmManager.RTC_WAKEUP,startTime.getTimeInMillis(),pendingIntent);
 
                 //Toast보여주기(알람 시간 표시)
-                Toast.makeText(RoomActivity.this, "Alarm : "+format.format(startTime.getTime()), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(RoomActivity.this, "Alarm : "+format.format(startTime.getTime()), Toast.LENGTH_SHORT).show();
 
 
                 }
@@ -183,7 +191,7 @@ public class RoomActivity extends AppCompatActivity {
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             database.child("users").child(ds.getKey()).child("rooms").child(roomId).setValue(null);
                         }
-                        Toast.makeText(getApplicationContext(), "방장이 방을 나갔습니다.", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), "방장이 방을 나갔습니다.", Toast.LENGTH_LONG).show();
                         finish();
                     }
                 }

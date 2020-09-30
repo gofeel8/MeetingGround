@@ -106,6 +106,7 @@
         android:layout_height="wrap_content"
         android:theme="@style/Widget.BottomNavigationView"
         android:visibility="invisible"
+        android:background="@color/colorMyTheme"
         app:itemBackground="@color/colorMyTheme"
         app:itemHorizontalTranslationEnabled="false"
         app:itemIconTint="@drawable/item_color"

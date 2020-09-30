@@ -80,7 +80,7 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(RestaurantDetail.this, "좋아요", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(RestaurantDetail.this, "좋아요", Toast.LENGTH_SHORT).show();
 
                 database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("vote").child(uid).setValue(true);
                 add(restaurant);
@@ -90,7 +90,7 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
         hate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(RestaurantDetail.this, "싫어요", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(RestaurantDetail.this, "싫어요", Toast.LENGTH_SHORT).show();
 
                 database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("vote").child(uid).setValue(false);
                 add(restaurant);
@@ -103,8 +103,8 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Toast.makeText(this, "Lat :" + Double.parseDouble(restaurant.getLat()), Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "Lon :" + Double.parseDouble(restaurant.getLon()), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Lat :" + Double.parseDouble(restaurant.getLat()), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Lon :" + Double.parseDouble(restaurant.getLon()), Toast.LENGTH_SHORT).show();
         LatLng rest = new LatLng(Double.parseDouble(restaurant.getLat()),Double.parseDouble(restaurant.getLon()));
         mMap.addMarker(new MarkerOptions()
                 .position(rest)
