@@ -181,7 +181,7 @@ public class AlarmService extends Service {
         roomName = intent.getStringExtra("roomName");
         Long temptime = intent.getLongExtra("meetingTime",0);
         if(temptime != 0){
-            long finishtime = 1; // 모임시간 finishtime분후 종료
+            long finishtime = 30; // 모임시간 finishtime분후 종료
 
             EndTime.setTimeInMillis(temptime+(finishtime*60*1000));
 
@@ -313,7 +313,7 @@ public class AlarmService extends Service {
                 new Intent(this, MainActivity.class), 0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .addAction(R.drawable.ic_launch, "지도보기",
+                .addAction(R.drawable.ic_launch, "MeetingGround",
                         activityPendingIntent)
 //                .addAction(R.drawable.ic_cancel, getString(R.string.remove_location_updates),
 //                        servicePendingIntent)
