@@ -43,6 +43,7 @@ public class RoomActivity extends AppCompatActivity {
     ListView lvUsers;
     TextView tvRoomName,tvRoomTime;
     Button btnSend, btnExit, btnBack,btnmap, btnRecommend;
+    boolean host;
 
     Long meetingTime;
     Calendar calendar;
@@ -183,6 +184,10 @@ public class RoomActivity extends AppCompatActivity {
                     else {
                         list.add(new UserDto(uName, uProfile,uId));
                     }
+
+                    if (uId.equals(uid)) {
+                        host = isHost;
+                    }
                 }
 
                 if (list.size() == 0 || !hasHost) {
@@ -312,6 +317,7 @@ public class RoomActivity extends AppCompatActivity {
                         intent2.putExtra("profile",profile);
                         intent2.putExtra("roomId",roomId);
                         intent2.putExtra("roomName",roomName);
+                        intent2.putExtra("host", host);
                         intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                         startActivity(intent2);

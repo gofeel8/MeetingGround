@@ -122,6 +122,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     static boolean first=false;
     private LinearLayout container;
     private List<Marker> marker;
+    boolean isHost;
     Marker clickposition;
     Polygon magneticCircle;
 
@@ -154,12 +155,10 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         roomId=intent.getStringExtra("roomId");
         uid=intent.getStringExtra("uid");
         database = FirebaseDatabase.getInstance().getReference();
+        isHost=intent.getBooleanExtra("host",false);
 //        Investment=0;
         marker=new LinkedList<>();
 
-        if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()==null){
-            container.removeAllViews();
-        }
 
         editText=(EditText)findViewById(R.id.editText);
         Places.initialize(getApplicationContext(),api_key);
@@ -181,6 +180,21 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 editText.setText("");
+            }
+        });
+        database.child("rooms").child(roomId).child("investment").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getValue() != null) {
+                    Investment = (int) (long) snapshot.getValue();
+                }else{
+                    Investment = 0;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
         database.child("rooms").child(roomId).child("investment").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -448,6 +462,9 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 return false;
             }
         });
+        if(!isHost){
+            container.removeAllViews();
+        }
     }
 
     @Override
@@ -994,7 +1011,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     startActivity(intent);
                 }
             });
-            if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()!=null) {
+            if(isHost) {
                 alert.setPositiveButton("모임장소지정", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
