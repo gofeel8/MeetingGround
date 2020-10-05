@@ -80,7 +80,7 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(RestaurantDetail.this, "좋아요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RestaurantDetail.this, "좋아요", Toast.LENGTH_SHORT).show();
 
                 database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("vote").child(uid).setValue(true);
                 add(restaurant);
@@ -90,7 +90,7 @@ public class RestaurantDetail extends AppCompatActivity implements OnMapReadyCal
         hate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(RestaurantDetail.this, "싫어요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RestaurantDetail.this, "싫어요", Toast.LENGTH_SHORT).show();
 
                 database.child("rooms").child(roomId).child("vote").child(restaurant.getId()).child("vote").child(uid).setValue(false);
                 add(restaurant);
