@@ -48,9 +48,9 @@ public class RoomActivity extends AppCompatActivity {
     Long meetingTime;
     Calendar calendar;
 
-    ValueEventListener listener1;
-    ValueEventListener listener2;
-    ValueEventListener listener3;
+    static ValueEventListener listener1;
+    static ValueEventListener listener2;
+    static ValueEventListener listener3;
 
     @Override
     protected void onDestroy() {
@@ -112,6 +112,8 @@ public class RoomActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
 
         //방에들어오면 알람이 설정된다. 동일한 이름의 PendingIntent는 덮어쓰여지는것으로 알고있음
+        if(listener1!=null)
+            database.child("rooms").child(roomId).child("info").child("settings").child("time").removeEventListener(listener1);
         listener1=database.child("rooms").child(roomId).child("info").child("settings").child("time").addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
 
@@ -176,7 +178,8 @@ public class RoomActivity extends AppCompatActivity {
 
             }
         });
-
+        if(listener2!=null)
+            database.child("rooms").child(roomId).child("info").child("users").removeEventListener(listener2);
         listener2=database.child("rooms").child(roomId).child("info").child("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -221,7 +224,8 @@ public class RoomActivity extends AppCompatActivity {
 
             }
         });
-
+        if(listener3!=null)
+            database.child("rooms").child(roomId).child("investment").removeEventListener(listener3);
         listener3=database.child("rooms").child(roomId).child("investment").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

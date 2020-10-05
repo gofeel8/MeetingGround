@@ -27,7 +27,7 @@ public class VoteActivity extends AppCompatActivity {
     private DatabaseReference database;
     String roomId;
 
-    ValueEventListener listener1;
+    static ValueEventListener listener1;
 
     @Override
     protected void onDestroy() {
@@ -98,7 +98,9 @@ public class VoteActivity extends AppCompatActivity {
         });
 
         roomId = intent.getStringExtra("roomId");
-        listener1= database.child("rooms").child(roomId).child("vote").addValueEventListener(new ValueEventListener() {
+        if(listener1!=null)
+                    database.child("rooms").child(roomId).child("vote").removeEventListener(listener1);
+            listener1= database.child("rooms").child(roomId).child("vote").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 adapter.items.clear();

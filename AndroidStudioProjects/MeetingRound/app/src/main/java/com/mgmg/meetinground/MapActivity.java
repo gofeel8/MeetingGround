@@ -134,8 +134,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     final Handler handler=new Handler();
     Runnable run=null;
 
-    ValueEventListener listener1;
-    ValueEventListener listener2;
+    static ValueEventListener listener1;
+    static ValueEventListener listener2;
 
     @Override
     protected void onDestroy() {
@@ -225,134 +225,137 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-        listener1=database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                LatLng now=new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
+        if(listener1!=null)
+        database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").removeEventListener(listener1);
+            listener1 = database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    LatLng now = new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
 
-                if(position==null)
-                    return;
-                mMap.clear();
-                com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
+                    if (position == null)
+                        return;
+                    mMap.clear();
+                    com.mgmg.meetinground.distance Distance = new com.mgmg.meetinground.distance("now", SphericalUtil.computeDistanceBetween(now, position));
 
 //                circlesize=(int)(meetingTime-System.currentTimeMillis())/10; // 2분까지는 광역시 만하고 2분만에 100m까지 줄어듬.
-                circlesize=(int)(meetingTime-System.currentTimeMillis())/400;
-                if(circlesize<100                                                                                                                                                                                                                 )
-                    circlesize=100;
-                PolygonOptions polygonOptions = createPolygonWithCircle(MapActivity.this,position,circlesize);
-                magneticCircle = mMap.addPolygon(polygonOptions);
+                    circlesize = (int) (meetingTime - System.currentTimeMillis()) / 400;
+                    if (circlesize < 100)
+                        circlesize = 100;
+                    PolygonOptions polygonOptions = createPolygonWithCircle(MapActivity.this, position, circlesize);
+                    magneticCircle = mMap.addPolygon(polygonOptions);
 //                magneticCircle = mMap.addCircle(new CircleOptions()
 //                        .center(position)
 //                        .radius(circlesize)
 //                        .fillColor(Color.parseColor("#50F08080"))); // in meters
 
 
-                if(Distance.getDistance()>circlesize){  // 원보다 밖에 있으면,
-                    NotificationManager notificationManager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-                    NotificationCompat.Builder builder=null;
+                    if (Distance.getDistance() > circlesize) {  // 원보다 밖에 있으면,
+                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        NotificationCompat.Builder builder = null;
 
-                    Investment+=100;
-                    database.child("rooms").child(roomId).child("investment").child(uid).setValue(Investment);
+                        Investment += 100;
+                        database.child("rooms").child(roomId).child("investment").child(uid).setValue(Investment);
 
 
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
-                        String channelID="channel_01";
-                        String channelName="MyChannel01";
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            String channelID = "channel_01";
+                            String channelName = "MyChannel01";
 
-                        NotificationChannel channel=new NotificationChannel(channelID,channelName,NotificationManager.IMPORTANCE_DEFAULT);
-                        notificationManager.createNotificationChannel(channel);
+                            NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+                            notificationManager.createNotificationChannel(channel);
 
-                        builder=new NotificationCompat.Builder(MapActivity.this,channelID);
-                    }else{
-                        builder=new NotificationCompat.Builder(MapActivity.this,null);
-                    }
+                            builder = new NotificationCompat.Builder(MapActivity.this, channelID);
+                        } else {
+                            builder = new NotificationCompat.Builder(MapActivity.this, null);
+                        }
 
-                    Intent push=new Intent(getApplicationContext(),MainActivity.class); // intent안에 이동할 class를 적어줌.
-                    push.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent fullScreen=PendingIntent.getActivity(MapActivity.this,0,push,PendingIntent.FLAG_UPDATE_CURRENT);
+                        Intent push = new Intent(getApplicationContext(), MainActivity.class); // intent안에 이동할 class를 적어줌.
+                        push.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        PendingIntent fullScreen = PendingIntent.getActivity(MapActivity.this, 0, push, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                    Uri defaultSoundUri= RingtoneManager.getDefaultUri((RingtoneManager.TYPE_NOTIFICATION));
-                    builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),android.R.drawable.ic_dialog_info))
-                            .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentTitle("MGMG")
-                            .setContentText("벌금이 부과됩니다.")
-                            .setAutoCancel(true)
-                            .setPriority(NotificationCompat.PRIORITY_MAX)
-                            .setDefaults(NotificationCompat.DEFAULT_ALL)
-                            .setSound(defaultSoundUri)
-                            .setContentIntent(fullScreen)
-                            .setFullScreenIntent(fullScreen,true);
+                        Uri defaultSoundUri = RingtoneManager.getDefaultUri((RingtoneManager.TYPE_NOTIFICATION));
+                        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_dialog_info))
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setContentTitle("MGMG")
+                                .setContentText("벌금이 부과됩니다.")
+                                .setAutoCancel(true)
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                                .setSound(defaultSoundUri)
+                                .setContentIntent(fullScreen)
+                                .setFullScreenIntent(fullScreen, true);
 
-                    notificationManager.notify(1,builder.build());
+                        notificationManager.notify(1, builder.build());
 //                        notificationManager.cancel(1);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
-
-        listener2= database.child("rooms").child(roomId).child("info").addValueEventListener(new ValueEventListener() {
-            final int _id = roomId.hashCode();
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                try{
-                    meetingTime=Long.parseLong(snapshot.child("settings").child("time").getValue().toString());
-                }catch (Exception E){
-                    finish();
                 }
-                //                // 1. 모임장소를 띄운다. + 자기장
-                if(snapshot.child("settings").child("address").getValue()==null) { // 모임장소가 정해지지 않았으면 내 위치만 띄워줌. -> 내 위치는 mapload때 띄워져 있음.
-                    return;
-                }
-                String str=snapshot.child("settings").child("address").getValue().toString();
-                Geocoder geocoder=new Geocoder(getBaseContext());
-                try{
-                    List<Address> addresses=geocoder.getFromLocationName(
-                            str,
-                            10);
-                    String []splitStr=addresses.get(0).toString().split(",");
-                    String address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
-                            splitStr[0].length()-2); // 주소 parsing
-                    String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
-                    String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
-                    position = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
-                    if(snapshot.child("users").child(uid).child("lat").getValue()==null||snapshot.child("users").child(uid).child("lon").getValue()==null){ // 데이터베이스에 위치정보가 갱신 x -> 게임시작 x 목적지와 내위치만 표시해줌.
-                        magnetic_field(null,null,null,false);
+            });
+            if(listener2!=null)
+                database.child("rooms").child(roomId).child("info").removeEventListener(listener2);
+            listener2 = database.child("rooms").child(roomId).child("info").addValueEventListener(new ValueEventListener() {
+                final int _id = roomId.hashCode();
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    try {
+                        meetingTime = Long.parseLong(snapshot.child("settings").child("time").getValue().toString());
+                    } catch (Exception E) {
+                        finish();
+                    }
+                    //                // 1. 모임장소를 띄운다. + 자기장
+                    if (snapshot.child("settings").child("address").getValue() == null) { // 모임장소가 정해지지 않았으면 내 위치만 띄워줌. -> 내 위치는 mapload때 띄워져 있음.
                         return;
                     }
-                    GameStart=true;
-                    container.removeAllViews();
-                    // 2. 각자의 위치를 띄운다.
+                    String str = snapshot.child("settings").child("address").getValue().toString();
+                    Geocoder geocoder = new Geocoder(getBaseContext());
+                    try {
+                        List<Address> addresses = geocoder.getFromLocationName(
+                                str,
+                                10);
+                        String[] splitStr = addresses.get(0).toString().split(",");
+                        String address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,
+                                splitStr[0].length() - 2); // 주소 parsing
+                        String latitude = splitStr[10].substring(splitStr[10].indexOf("=") + 1);
+                        String longtitude = splitStr[12].substring(splitStr[12].indexOf("=") + 1);
+                        position = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longtitude));
+                        if (snapshot.child("users").child(uid).child("lat").getValue() == null || snapshot.child("users").child(uid).child("lon").getValue() == null) { // 데이터베이스에 위치정보가 갱신 x -> 게임시작 x 목적지와 내위치만 표시해줌.
+                            magnetic_field(null, null, null, false);
+                            return;
+                        }
+                        GameStart = true;
+                        container.removeAllViews();
+                        // 2. 각자의 위치를 띄운다.
 //                    List<LatLng> position=new LinkedList<>();
-                    List<LatLng> user_pos=new LinkedList<>();
-                    List<String> profile=new LinkedList<>();
-                    List<String> name=new LinkedList<>();
-                    Iterator<DataSnapshot> users=snapshot.child("users").getChildren().iterator();
-                    while(users.hasNext()) {
-                        DataSnapshot snap = users.next();
-                        if (snap.child("lat").getValue() == null || snap.child("lon").getValue() == null)
-                            continue;
-                        String Lat = snap.child("lat").getValue().toString();
-                        String Lng = snap.child("lon").getValue().toString();
-                        profile.add(snap.child("profile").getValue().toString());
-                        name.add(snap.child("name").getValue().toString());
+                        List<LatLng> user_pos = new LinkedList<>();
+                        List<String> profile = new LinkedList<>();
+                        List<String> name = new LinkedList<>();
+                        Iterator<DataSnapshot> users = snapshot.child("users").getChildren().iterator();
+                        while (users.hasNext()) {
+                            DataSnapshot snap = users.next();
+                            if (snap.child("lat").getValue() == null || snap.child("lon").getValue() == null)
+                                continue;
+                            String Lat = snap.child("lat").getValue().toString();
+                            String Lng = snap.child("lon").getValue().toString();
+                            profile.add(snap.child("profile").getValue().toString());
+                            name.add(snap.child("name").getValue().toString());
 //                        position.add(new LatLng(Double.parseDouble(Lat),Double.parseDouble(Lng)));
-                        user_pos.add(new LatLng(Double.parseDouble(Lat),Double.parseDouble(Lng)));
+                            user_pos.add(new LatLng(Double.parseDouble(Lat), Double.parseDouble(Lng)));
+                        }
+                        magnetic_field(user_pos, profile, name, true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    magnetic_field(user_pos,profile,name,true);
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
 
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
 
 
         button2=(Button)findViewById(R.id.button2);
