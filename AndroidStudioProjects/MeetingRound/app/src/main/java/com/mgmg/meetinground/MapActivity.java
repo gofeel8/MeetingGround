@@ -982,17 +982,17 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             alert.setMessage(address+"를 선택하셨습니다.");
 
 
-//            alert.setNeutralButton("맛집추천받기", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
+            alert.setNeutralButton("맛집추천받기", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 //                    Toast.makeText(MapActivity.this,"현재위치"+now.toString(),Toast.LENGTH_SHORT).show();
-//                    Intent intent=new Intent(MapActivity.this,RecommendActivity.class);
-//                    intent.putExtra("lat",now.latitude);
-//                    intent.putExtra("lon",now.longitude);
-//                    intent.putExtras(getIntent());
-//                    startActivity(intent);
-//                }
-//            });
+                    Intent intent=new Intent(MapActivity.this,RecommendActivity.class);
+                    intent.putExtra("lat",now.latitude);
+                    intent.putExtra("lon",now.longitude);
+                    intent.putExtras(getIntent());
+                    startActivity(intent);
+                }
+            });
             if(database.child("rooms").child(roomId).child("info").child("users").child(uid).child("host").getKey()!=null) {
                 alert.setPositiveButton("모임장소지정", new DialogInterface.OnClickListener() {
                     @Override
