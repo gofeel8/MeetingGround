@@ -209,8 +209,9 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.clear();
                 com.mgmg.meetinground.distance Distance=new com.mgmg.meetinground.distance("now",SphericalUtil.computeDistanceBetween(now,position));
 
-                circlesize=(int)(meetingTime-System.currentTimeMillis())/10;
-                if(circlesize<100)
+//                circlesize=(int)(meetingTime-System.currentTimeMillis())/10; // 2분까지는 광역시 만하고 2분만에 100m까지 줄어듬.
+                circlesize=(int)(meetingTime-System.currentTimeMillis())/400;
+                if(circlesize<100                                                                                                                                                                                                                 )
                     circlesize=100;
                 PolygonOptions polygonOptions = createPolygonWithCircle(MapActivity.this,position,circlesize);
                 magneticCircle = mMap.addPolygon(polygonOptions);
@@ -920,9 +921,9 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 if(magneticCircle==null) {
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                     mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
-                    circlesize = (int) (meetingTime - System.currentTimeMillis()) / 10;
-                    if (circlesize < 100)
-                        circlesize = 100;
+                    circlesize=(int)(meetingTime-System.currentTimeMillis())/400;
+                    if(circlesize<100                                                                                                                                                                                                                 )
+                        circlesize=100;
                     PolygonOptions polygonOptions = createPolygonWithCircle(MapActivity.this,position,circlesize);
                     magneticCircle = mMap.addPolygon(polygonOptions);
 //                    mMap.addCircle(new CircleOptions()
