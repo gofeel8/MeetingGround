@@ -140,8 +140,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy() {
 //        Log.d("gps", "onDestroy: 리스너 죽임");
-        database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").removeEventListener(listener1);
-        database.child("rooms").child(roomId).child("info").removeEventListener(listener2);
+//        database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").removeEventListener(listener1);
+//        database.child("rooms").child(roomId).child("info").removeEventListener(listener2);
         super.onDestroy();
     }
 
@@ -454,7 +454,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         Intent intent = getIntent();
                         Intent intent2=new Intent(MapActivity.this,RoomActivity.class);
                         intent2.putExtras(intent);
-                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
                         startActivity(intent2);
                         return true;
                     case R.id.tab2:
@@ -464,7 +464,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         Intent intent3 = new Intent(getApplicationContext(), VoteActivity.class);
                         intent3.putExtras(intent);
 
-                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
 
                         startActivity(intent3);
 

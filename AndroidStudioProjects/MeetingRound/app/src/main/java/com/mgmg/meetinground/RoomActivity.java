@@ -55,9 +55,9 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 //        Log.d("gps", "onDestroy: 리스너 죽임");
-        database.child("rooms").child(roomId).child("info").child("settings").child("time").removeEventListener(listener1);
-        database.child("rooms").child(roomId).child("info").child("users").removeEventListener(listener2);
-        database.child("rooms").child(roomId).child("investment").removeEventListener(listener3);
+//        database.child("rooms").child(roomId).child("info").child("settings").child("time").removeEventListener(listener1);
+//        database.child("rooms").child(roomId).child("info").child("users").removeEventListener(listener2);
+//        database.child("rooms").child(roomId).child("investment").removeEventListener(listener3);
         super.onDestroy();
     }
 
@@ -309,7 +309,10 @@ public class RoomActivity extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                startActivity(intent);
+//                finish();
             }
         });
 
@@ -331,7 +334,7 @@ public class RoomActivity extends AppCompatActivity {
                         intent2.putExtra("roomId",roomId);
                         intent2.putExtra("roomName",roomName);
                         intent2.putExtra("host", host);
-                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
 
                         startActivity(intent2);
 
@@ -340,7 +343,7 @@ public class RoomActivity extends AppCompatActivity {
                         Intent intent3 = new Intent(RoomActivity.this, VoteActivity.class);
 
                         intent3.putExtras(intent);
-                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
 
                         startActivity(intent3);
 
