@@ -18,7 +18,6 @@
         app:showAsAction="ifRoom"
         android:enabled="true"
         android:icon="@drawable/recommend"
-        android:visible="false"
         android:title="투표"/>
 
 
