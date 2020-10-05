@@ -48,6 +48,19 @@ public class RoomActivity extends AppCompatActivity {
     Long meetingTime;
     Calendar calendar;
 
+    ValueEventListener listener1;
+    ValueEventListener listener2;
+    ValueEventListener listener3;
+
+    @Override
+    protected void onDestroy() {
+//        Log.d("gps", "onDestroy: 리스너 죽임");
+        database.child("rooms").child(roomId).child("info").child("settings").child("time").removeEventListener(listener1);
+        database.child("rooms").child(roomId).child("info").child("users").removeEventListener(listener2);
+        database.child("rooms").child(roomId).child("investment").removeEventListener(listener3);
+        super.onDestroy();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -99,7 +112,7 @@ public class RoomActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
 
         //방에들어오면 알람이 설정된다. 동일한 이름의 PendingIntent는 덮어쓰여지는것으로 알고있음
-        database.child("rooms").child(roomId).child("info").child("settings").child("time").addValueEventListener(new ValueEventListener() {
+        listener1=database.child("rooms").child(roomId).child("info").child("settings").child("time").addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
 
             @Override
@@ -164,7 +177,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        database.child("rooms").child(roomId).child("info").child("users").addValueEventListener(new ValueEventListener() {
+        listener2=database.child("rooms").child(roomId).child("info").child("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -209,7 +222,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         });
 
-        database.child("rooms").child(roomId).child("investment").addValueEventListener(new ValueEventListener() {
+        listener3=database.child("rooms").child(roomId).child("investment").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
@@ -340,6 +353,8 @@ public class RoomActivity extends AppCompatActivity {
 
 
     }
+
+
 
     @Override
     protected void onPostResume() {

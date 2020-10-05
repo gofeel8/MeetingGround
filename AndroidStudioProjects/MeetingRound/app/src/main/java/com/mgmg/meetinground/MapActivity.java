@@ -134,6 +134,16 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     final Handler handler=new Handler();
     Runnable run=null;
 
+    ValueEventListener listener1;
+    ValueEventListener listener2;
+
+    @Override
+    protected void onDestroy() {
+//        Log.d("gps", "onDestroy: 리스너 죽임");
+        database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").removeEventListener(listener1);
+        database.child("rooms").child(roomId).child("info").removeEventListener(listener2);
+        super.onDestroy();
+    }
 
     @Override
     protected void onPause() {
@@ -213,7 +223,9 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
+
+
+        listener1=database.child("rooms").child(roomId).child("info").child("users").child(uid).child("lat").addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 LatLng now=new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude());
@@ -282,7 +294,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        database.child("rooms").child(roomId).child("info").addValueEventListener(new ValueEventListener() {
+        listener2= database.child("rooms").child(roomId).child("info").addValueEventListener(new ValueEventListener() {
             final int _id = roomId.hashCode();
 
             @Override

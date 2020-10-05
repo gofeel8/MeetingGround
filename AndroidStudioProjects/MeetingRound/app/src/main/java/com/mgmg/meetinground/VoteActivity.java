@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -25,6 +26,16 @@ public class VoteActivity extends AppCompatActivity {
     VoteAdapter adapter;
     private DatabaseReference database;
     String roomId;
+
+    ValueEventListener listener1;
+
+    @Override
+    protected void onDestroy() {
+//        Log.d("gps", "onDestroy: 리스너 죽임");
+        database.child("rooms").child(roomId).child("vote").removeEventListener(listener1);
+        super.onDestroy();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +98,7 @@ public class VoteActivity extends AppCompatActivity {
         });
 
         roomId = intent.getStringExtra("roomId");
-        database.child("rooms").child(roomId).child("vote").addValueEventListener(new ValueEventListener() {
+        listener1= database.child("rooms").child(roomId).child("vote").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 adapter.items.clear();
