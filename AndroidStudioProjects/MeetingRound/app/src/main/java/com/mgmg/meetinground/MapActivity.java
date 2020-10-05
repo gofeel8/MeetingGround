@@ -241,7 +241,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         builder=new NotificationCompat.Builder(MapActivity.this,null);
                     }
 
-                    Intent push=new Intent(getApplicationContext(),MapActivity.class); // intent안에 이동할 class를 적어줌.
+                    Intent push=new Intent(getApplicationContext(),MainActivity.class); // intent안에 이동할 class를 적어줌.
                     push.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     PendingIntent fullScreen=PendingIntent.getActivity(MapActivity.this,0,push,PendingIntent.FLAG_UPDATE_CURRENT);
 
