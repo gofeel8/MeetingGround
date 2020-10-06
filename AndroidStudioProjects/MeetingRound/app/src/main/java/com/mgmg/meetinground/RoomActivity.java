@@ -314,7 +314,7 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
 //                finish();
             }
@@ -338,7 +338,7 @@ public class RoomActivity extends AppCompatActivity {
                         intent2.putExtra("roomId",roomId);
                         intent2.putExtra("roomName",roomName);
                         intent2.putExtra("host", host);
-                        intent2.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                         startActivity(intent2);
 
@@ -347,7 +347,7 @@ public class RoomActivity extends AppCompatActivity {
                         Intent intent3 = new Intent(RoomActivity.this, VoteActivity.class);
 
                         intent3.putExtras(intent);
-                        intent3.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                         startActivity(intent3);
 
