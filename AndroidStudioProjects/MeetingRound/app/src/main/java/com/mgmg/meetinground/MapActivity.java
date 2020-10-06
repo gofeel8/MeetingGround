@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -364,9 +365,69 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
         }else {
             checkRunTimePermission();
         }
-//        final TextView textview_address = (TextView)findViewById(R.id.textView);
 
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                mMap.clear();
 
+                String str=editText.getText().toString();
+
+                gpsTracker = new GpsTracker(MapActivity.this);
+                String myurl=getIntent().getStringExtra("profile");
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                LatLng mine = (new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+                markerOptions.position(mine);
+                markerOptions.title("나");
+                if(!myurl.equals("")) {
+                    if (android.os.Build.VERSION.SDK_INT > 9) {
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
+                    }
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getBitmapFromLink(myurl)));
+                }else{
+                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.logo);
+                    Bitmap b=bitmapDrawable.getBitmap();
+                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,100,100,false);
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(getCircularBitmap(smallMarker)));
+                }
+                mMap.addMarker(markerOptions);
+
+                // marker title
+                Geocoder geocoder=new Geocoder(getBaseContext());
+                try {
+                    List<Address> addresses=geocoder.getFromLocationName(
+                            str,
+                            10);
+                    if(addresses.size()==0){
+                        Toast.makeText(MapActivity.this,"조금 더 정확한 명칭을 넣어주세요.",Toast.LENGTH_SHORT).show();
+                    }else{
+                        String []splitStr=addresses.get(0).toString().split(",");
+                        String address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
+                                splitStr[0].length()-2); // 주소 parsing
+                        String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
+                        String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
+                        position = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
+                        MarkerOptions markerOptions1=new MarkerOptions();
+                        markerOptions1.title("click");
+                        markerOptions1.position(position);
+
+                        BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click2);
+                        Bitmap b=bitmapDrawable.getBitmap();
+                        Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
+                        markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+                        mMap.addMarker(markerOptions1);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                InputMethodManager imm=(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(editText.getWindowToken(),0);
+                return true;
+            }
+        });
         button2.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {
