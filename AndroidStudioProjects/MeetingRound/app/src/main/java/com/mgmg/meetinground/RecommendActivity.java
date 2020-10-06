@@ -1,6 +1,7 @@
 package com.mgmg.meetinground;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ public class RecommendActivity extends AppCompatActivity {
     StringAdapter keyAdapter;
     ResultAdapter resultAdapter;
     ListView lvKey, lvResult;
+    ConstraintLayout clNoResult;
     String[] keys = {"존맛","혼밥","갬성","깔끔","백종원","가성비","채식","한식","양식","분식","면류","일식","치킨","피자","중식","카페","고기집","디저트","샌드위치","버거","주점","도시락","뷔페","기타"};
     boolean[] checked;
     List<Restaurant> restaurants;
@@ -40,6 +42,7 @@ public class RecommendActivity extends AppCompatActivity {
 
         lvKey = findViewById(R.id.lvKey);
         lvResult = findViewById(R.id.lvResult);
+        clNoResult = findViewById(R.id.clNoResult);
 
         Intent intent = getIntent();
         lat = intent.getDoubleExtra("lat", 0);
@@ -89,9 +92,9 @@ public class RecommendActivity extends AppCompatActivity {
                     restaurants.clear();
                     tmp = response.getJSONArray("result");
                     if(tmp.length()==0){
-                        Toast.makeText(this, "검색 결과가 없습니다", Toast.LENGTH_SHORT).show();
+                        clNoResult.setVisibility(View.VISIBLE);
                     }else{
-
+                        clNoResult.setVisibility(View.INVISIBLE);
                     for (int i = 0; i < tmp.length(); i++) {
                         restaurants.add(new Gson().fromJson(tmp.getJSONObject(i).toString(), Restaurant.class));
                     }

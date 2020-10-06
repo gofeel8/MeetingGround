@@ -19,15 +19,36 @@
     </ListView>
 
 
-
-    <ListView
-        android:id="@+id/lvResult"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="#FFFFFF"
-        android:divider="#000000"
-        android:dividerHeight="0dp">
+        android:layout_weight="1">
 
-    </ListView>
+        <ListView
+            android:id="@+id/lvResult"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFFFFF"
+            android:divider="#000000"
+            android:dividerHeight="0dp">
+
+        </ListView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clNoResult"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible">
+
+            <TextView
+                android:id="@+id/tvNoResult"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="검색 결과가 없습니다."
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </LinearLayout>
