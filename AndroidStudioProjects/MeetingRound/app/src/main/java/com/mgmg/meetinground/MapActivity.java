@@ -802,7 +802,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     Geocoder geocoder=new Geocoder(getBaseContext());
                     try{
                         List<Address> addresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude,1);
-                        System.out.println(addresses.toString());
                         if(!addresses.isEmpty()) {
                             String[] splitStr = addresses.get(0).toString().split(",");
                             address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,
@@ -811,6 +810,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                             editText.setText(address);
                             MarkerOptions markerOptions1=new MarkerOptions();
                             markerOptions1.position(latLng);
+                            markerOptions1.title("click");
                             BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click2);
                             Bitmap b=bitmapDrawable.getBitmap();
                             // Return the circular bitmap
