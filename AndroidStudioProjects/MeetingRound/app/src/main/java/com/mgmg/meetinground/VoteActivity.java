@@ -75,14 +75,14 @@ public class VoteActivity extends AppCompatActivity {
                     case R.id.tab1:
                         Intent intent3=new Intent(VoteActivity.this,RoomActivity.class);
                         intent3.putExtras(intent);
-                        intent3.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent3);
                         return true;
                     case R.id.tab2:
 
                         Intent intent2=new Intent(VoteActivity.this,MapActivity.class);
                         intent2.putExtras(intent);
-                        intent2.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                         startActivity(intent2);
 

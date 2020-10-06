@@ -457,7 +457,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         Intent intent = getIntent();
                         Intent intent2=new Intent(MapActivity.this,RoomActivity.class);
                         intent2.putExtras(intent);
-                        intent2.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                        intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent2);
                         return true;
                     case R.id.tab2:
@@ -467,7 +467,7 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                         Intent intent3 = new Intent(getApplicationContext(), VoteActivity.class);
                         intent3.putExtras(intent);
 
-                        intent3.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                        intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                         startActivity(intent3);
 

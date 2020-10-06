@@ -80,7 +80,7 @@ public class MakeActivity extends AppCompatActivity {
                 calendar.set(y, m, d, hrs, min,0);
 
                 if(calendar.before(nowTime)){
-                    Toast.makeText(MakeActivity.this, "시간을 확인해주세요", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MakeActivity.this, "모임시간을 현재시간 이후로 설정해주세요", Toast.LENGTH_SHORT).show();
                 }else{
                     Intent intent = new Intent();
                     intent.putExtra("roomName", etName.getText().toString());
