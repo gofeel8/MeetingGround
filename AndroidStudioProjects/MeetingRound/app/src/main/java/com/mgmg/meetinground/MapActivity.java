@@ -799,27 +799,30 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     mMap.addMarker(markerOptions);
                     // marker title
-                    MarkerOptions markerOptions1=new MarkerOptions();
-                    markerOptions1.title("click");
-                    markerOptions1.position(latLng);
                     Geocoder geocoder=new Geocoder(getBaseContext());
                     try{
                         List<Address> addresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude,1);
-                        String []splitStr=addresses.get(0).toString().split(",");
-                        address=splitStr[0].substring(splitStr[0].indexOf("\"")+1,
-                                splitStr[0].length()-2); // 주소 parsing
-                        editText.requestFocus();
-                        editText.setText(address);
+                        System.out.println(addresses.toString());
+                        if(!addresses.isEmpty()) {
+                            String[] splitStr = addresses.get(0).toString().split(",");
+                            address = splitStr[0].substring(splitStr[0].indexOf("\"") + 1,
+                                    splitStr[0].length() - 2); // 주소 parsing
+                            editText.requestFocus();
+                            editText.setText(address);
+                            MarkerOptions markerOptions1=new MarkerOptions();
+                            markerOptions1.position(latLng);
+                            BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click2);
+                            Bitmap b=bitmapDrawable.getBitmap();
+                            // Return the circular bitmap
+                            Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
+                            markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+//                    markerOptions1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                            clickposition=mMap.addMarker(markerOptions1);
+                        }
                     }catch (IOException e){
                         e.printStackTrace();
                     }
-                    BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click2);
-                    Bitmap b=bitmapDrawable.getBitmap();
-                    // Return the circular bitmap
-                    Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
-                    markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
-//                    markerOptions1.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                    clickposition=mMap.addMarker(markerOptions1);
+
                 }
             }
         });
@@ -1060,6 +1063,8 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onMarkerClick(Marker marker) {
         String temp=marker.getTitle();
+        if(temp==null)
+            return false;
         if(temp.equals("click")){
             AlertDialog.Builder alert = new AlertDialog.Builder(MapActivity.this);
             LatLng now=marker.getPosition();
