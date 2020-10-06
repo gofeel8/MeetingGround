@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -26,6 +27,8 @@ public class VoteActivity extends AppCompatActivity {
     VoteAdapter adapter;
     private DatabaseReference database;
     String roomId;
+    RecyclerView recyclerView;
+    TextView tvNoVote;
 
     static ValueEventListener listener1;
 
@@ -42,9 +45,10 @@ public class VoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_vote);
 
         database = FirebaseDatabase.getInstance().getReference();
-        RecyclerView recyclerView = findViewById(R.id.recycleView);
+        recyclerView = findViewById(R.id.recycleView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager( layoutManager);
+        tvNoVote = findViewById(R.id.tvNoVote);
 
         adapter = new VoteAdapter();
         recyclerView.setAdapter(adapter);
@@ -125,6 +129,11 @@ public class VoteActivity extends AppCompatActivity {
                     r.setAgree(agree);
                     r.setDisagree(disagree);
                     adapter.addItem(r);
+                }
+                if (adapter.items.size() == 0) {
+                    tvNoVote.setVisibility(View.VISIBLE);
+                } else {
+                    tvNoVote.setVisibility(View.INVISIBLE);
                 }
                 adapter.notifyDataSetChanged();
             }
