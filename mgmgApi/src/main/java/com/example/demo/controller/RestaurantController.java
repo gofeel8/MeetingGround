@@ -57,9 +57,7 @@ public class RestaurantController {
 		Distance distance = new Distance(50, Metrics.KILOMETERS);
 		Circle area=new Circle(point, distance);
 		List<Restaurant>list=restaurantService.findByLocWithin(area);	
-        for(Restaurant r:list) {
-        	
-        }
+       
 		int cnt=0;
 		ArrayList<Simil>csList=new ArrayList<>();
 		int[] a=new int[24];
@@ -74,15 +72,18 @@ public class RestaurantController {
 			for(int num:el.getTags()) {
 				b[idx++]=num;
 			}
-			csList.add(new Simil(cnt++,cs.calCS(a,b)));
+			double result=cs.calCS(a,b);
+			if(Double.isNaN(result))continue;
+			csList.add(new Simil(cnt++,result));
 		}
 		csList.sort(Comparator.comparing(Simil::getSimilarity).reversed());
 		int len=csList.size();
+		
 		len=len>30?30:len;
 		List<Restaurant>result=new ArrayList<>();
 		List<Integer>NanList=new ArrayList<>();
 		for(int i=0;i<len;i++) {
-			Simil el=csList.get(i);
+			Simil el=csList.get(i);			
 			if(Double.isNaN(el.getSimilarity())) {
 				//NanList.add(el.getIdx());
 			}else {
