@@ -17,6 +17,7 @@ public class CosineSimilarity {
     	if (sumASq == 0 && sumBSq == 0) {
     		return 2.0;
     	}
+    	
     	return sumProduct / (Math.sqrt(sumASq) * Math.sqrt(sumBSq));
 	}
 }
