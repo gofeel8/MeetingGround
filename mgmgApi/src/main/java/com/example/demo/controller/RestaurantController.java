@@ -54,7 +54,7 @@ public class RestaurantController {
     public String getAll(@RequestBody Info info){            	
     	
         Point point = new Point(info.getLat(),info.getLon());    	
-		Distance distance = new Distance(50, Metrics.KILOMETERS);
+		Distance distance = new Distance(20, Metrics.KILOMETERS);
 		Circle area=new Circle(point, distance);
 		List<Restaurant>list=restaurantService.findByLocWithin(area);	
        
