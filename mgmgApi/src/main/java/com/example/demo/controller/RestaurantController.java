@@ -77,17 +77,20 @@ public class RestaurantController {
 		}
 		csList.sort(Comparator.comparing(Simil::getSimilarity).reversed());
 		int len=csList.size();
-		
-		len=len>30?30:len;
+		int max=len>30?30:len;		
 		List<Restaurant>result=new ArrayList<>();
 		List<Integer>NanList=new ArrayList<>();
-		for(int i=0;i<len;i++) {
-			Simil el=csList.get(i);			
+		int cnt1=0;
+		idx=0;
+		while(true) {
+			if(idx>=len||cnt1>=max)break;
+			Simil el=csList.get(idx++);			
 			if(Double.isNaN(el.getSimilarity())) {
-				NanList.add(el.getIdx());
+				//NanList.add(el.getIdx());
 			}else {
 				if(el.getSimilarity()>0.0) {
 					result.add(list.get(el.getIdx()));
+					cnt1++;
 				}				
 			}			
 		}
