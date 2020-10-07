@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Collections;
 import java.util.List;
 
 public class VoteActivity extends AppCompatActivity {
@@ -133,6 +134,12 @@ public class VoteActivity extends AppCompatActivity {
                 if (adapter.items.size() == 0) {
                     tvNoVote.setVisibility(View.VISIBLE);
                 } else {
+                    Collections.sort(adapter.items, (o1, o2) -> {
+                        if (o1.getAgree() == o2.getAgree()) {
+                            return o1.getDisagree() - o2.getDisagree();
+                        }
+                        return o2.getAgree() - o1.getAgree();
+                    });
                     tvNoVote.setVisibility(View.INVISIBLE);
                 }
                 adapter.notifyDataSetChanged();
