@@ -54,10 +54,12 @@ public class RestaurantController {
     public String getAll(@RequestBody Info info){            	
     	
         Point point = new Point(info.getLat(),info.getLon());    	
-		Distance distance = new Distance(10, Metrics.KILOMETERS);
+		Distance distance = new Distance(20, Metrics.KILOMETERS);
 		Circle area=new Circle(point, distance);
 		List<Restaurant>list=restaurantService.findByLocWithin(area);	
-        
+        for(Restaurant r:list) {
+        	
+        }
 		int cnt=0;
 		ArrayList<Simil>csList=new ArrayList<>();
 		int[] a=new int[24];
@@ -76,7 +78,7 @@ public class RestaurantController {
 		}
 		csList.sort(Comparator.comparing(Simil::getSimilarity).reversed());
 		int len=csList.size();
-		len=len>20?20:len;
+		len=len>30?30:len;
 		List<Restaurant>result=new ArrayList<>();
 		List<Integer>NanList=new ArrayList<>();
 		for(int i=0;i<len;i++) {
@@ -148,7 +150,7 @@ public class RestaurantController {
 			while (iter.hasNext()) {
 				tags.add(iter.next().toString());				
 			}
-			System.out.println(tags.toString());
+			//System.out.println(tags.toString());
 			r.setTags(tags);
 			r.setImages(el.getImages());
 			res.add(r);
