@@ -44,6 +44,7 @@ public class RoomActivity extends AppCompatActivity {
     TextView tvRoomName,tvRoomTime;
     Button btnSend, btnExit, btnBack,btnmap, btnRecommend;
     boolean host;
+    Map<String, Integer> map;
 
     Long meetingTime;
     Calendar calendar;
@@ -105,6 +106,7 @@ public class RoomActivity extends AppCompatActivity {
         lvUsers.setAdapter(userAdapter);
         tvRoomName.setText(roomName);
 
+        map = new HashMap<>();
 
          calendar = Calendar.getInstance();
 
@@ -135,12 +137,19 @@ public class RoomActivity extends AppCompatActivity {
                     Calendar EndTime = Calendar.getInstance();
                     EndTime.setTimeInMillis(meetingTime+(finishtime*60*1000));
 
+                    Calendar StartTime = Calendar.getInstance();
+                    StartTime.setTimeInMillis(meetingTime-(finishtime*60*1000));
 
 
+
+                    if (StartTime.after(Calendar.getInstance())) {
+                        btnExit.setVisibility(View.VISIBLE);
+                    }
 
                     if(EndTime.before(Calendar.getInstance())){
 //                    Toast.makeText(RoomActivity.this, "지난 모임방에들어옴", Toast.LENGTH_SHORT).show();
 //                    bottomNavigation.setVisibility(View.INVISIBLE);
+                    btnExit.setVisibility(View.VISIBLE);
 
                     return;
                 }
@@ -190,15 +199,19 @@ public class RoomActivity extends AppCompatActivity {
                     String uId =ds.getKey();
                     String uName = (String) ds.child("name").getValue();
                     String uProfile = (String) ds.child("profile").getValue();
+                    int invest = 0;
+                    if (map.containsKey(uId)) {
+                        invest = map.get(uId);
+                    }
                     boolean isHost = false;
                     if (ds.child("host").getValue() != null)
                         isHost = true;
                     if (isHost) {
-                        list.add(0, new UserDto(uName, uProfile,uId));
+                        list.add(0, new UserDto(uName, uProfile,uId,invest));
                         hasHost = true;
                     }
                     else {
-                        list.add(new UserDto(uName, uProfile,uId));
+                        list.add(new UserDto(uName, uProfile,uId,invest));
                     }
 
                     if (uId.equals(uid)) {
@@ -234,6 +247,7 @@ public class RoomActivity extends AppCompatActivity {
                     for(int i=0;i<list.size();i++){
                         if(list.get(i).getuId().equals(ds.getKey())){
                             list.get(i).setInvest( (int) (long) ds.getValue());
+                            map.put(ds.getKey(), (int) (long) ds.getValue());
                             userAdapter.notifyDataSetChanged();
                             break;
                         }

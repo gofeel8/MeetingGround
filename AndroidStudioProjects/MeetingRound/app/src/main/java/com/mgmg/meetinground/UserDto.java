@@ -21,6 +21,13 @@ public class UserDto {
         invest = 0;
     }
 
+    public UserDto(String name, String profile, String uId, int invest) {
+        this.name = name;
+        this.profile = profile;
+        this.uId = uId;
+        this.invest = invest;
+    }
+
     public int getInvest() {
         return invest;
     }
