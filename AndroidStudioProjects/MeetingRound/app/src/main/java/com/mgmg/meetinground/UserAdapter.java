@@ -50,7 +50,7 @@ public class UserAdapter extends BaseAdapter {
 
         Glide.with(context).load(list.get(position).getProfile()).into(ivProfile);
         tvName.setText(list.get(position).getName());
-        invest.setText(Integer.toString(list.get(position).getInvest()));
+        invest.setText(Integer.toString(list.get(position).getInvest())+"원");
         if (position == 0)
             ivHost.setVisibility(View.VISIBLE);
 

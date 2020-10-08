@@ -54,10 +54,10 @@ public class RestaurantController {
     public String getAll(@RequestBody Info info){            	
     	
         Point point = new Point(info.getLat(),info.getLon());    	
-		Distance distance = new Distance(10, Metrics.KILOMETERS);
+		Distance distance = new Distance(20, Metrics.KILOMETERS);
 		Circle area=new Circle(point, distance);
 		List<Restaurant>list=restaurantService.findByLocWithin(area);	
-        
+       
 		int cnt=0;
 		ArrayList<Simil>csList=new ArrayList<>();
 		int[] a=new int[24];
@@ -72,20 +72,25 @@ public class RestaurantController {
 			for(int num:el.getTags()) {
 				b[idx++]=num;
 			}
-			csList.add(new Simil(cnt++,cs.calCS(a,b)));
+			double result=cs.calCS(a,b);		
+			csList.add(new Simil(cnt++,result));
 		}
 		csList.sort(Comparator.comparing(Simil::getSimilarity).reversed());
 		int len=csList.size();
-		len=len>20?20:len;
+		int max=len>30?30:len;		
 		List<Restaurant>result=new ArrayList<>();
 		List<Integer>NanList=new ArrayList<>();
-		for(int i=0;i<len;i++) {
-			Simil el=csList.get(i);
+		int cnt1=0;
+		idx=0;
+		while(true) {
+			if(idx>=len||cnt1>=max)break;
+			Simil el=csList.get(idx++);			
 			if(Double.isNaN(el.getSimilarity())) {
 				//NanList.add(el.getIdx());
 			}else {
 				if(el.getSimilarity()>0.0) {
 					result.add(list.get(el.getIdx()));
+					cnt1++;
 				}				
 			}			
 		}
@@ -148,7 +153,7 @@ public class RestaurantController {
 			while (iter.hasNext()) {
 				tags.add(iter.next().toString());				
 			}
-			System.out.println(tags.toString());
+			//System.out.println(tags.toString());
 			r.setTags(tags);
 			r.setImages(el.getImages());
 			res.add(r);
