@@ -58,6 +58,7 @@ public class UserDto {
         return "MyUser{" +
                 "name='" + name + '\'' +
                 ", profile='" + profile + '\'' +
+                ", investment="+invest+'\''+
                 '}';
     }
 }

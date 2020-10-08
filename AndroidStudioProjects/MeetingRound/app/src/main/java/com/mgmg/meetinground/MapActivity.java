@@ -504,8 +504,6 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                InputMethodManager imm=(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(editText.getWindowToken(),0);
             }
         });
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);

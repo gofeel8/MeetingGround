@@ -224,8 +224,8 @@ public class RoomActivity extends AppCompatActivity {
 
             }
         });
-        if(listener3!=null)
-            database.child("rooms").child(roomId).child("investment").removeEventListener(listener3);
+//        if(listener3!=null)
+//            database.child("rooms").child(roomId).child("investment").removeEventListener(listener3);
         listener3=database.child("rooms").child(roomId).child("investment").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -234,12 +234,12 @@ public class RoomActivity extends AppCompatActivity {
                     for(int i=0;i<list.size();i++){
                         if(list.get(i).getuId().equals(ds.getKey())){
                             list.get(i).setInvest( (int) (long) ds.getValue());
+                            System.out.println("list: "+list.toString());
                             userAdapter.notifyDataSetChanged();
                             break;
                         }
                     }
                 }
-
             }
 
             @Override
