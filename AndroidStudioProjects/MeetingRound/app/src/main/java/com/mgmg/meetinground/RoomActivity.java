@@ -225,8 +225,7 @@ public class RoomActivity extends AppCompatActivity {
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             database.child("users").child(ds.getKey()).child("rooms").child(roomId).setValue(null);
                         }
-                        Toast.makeText(getApplicationContext(), "방장이 방을 나갔습니다.", Toast.LENGTH_LONG).show();
-                        finish();
+                        Toast.makeText(getApplicationContext(), "방장이 방을 나갔습니다.", Toast.LENGTH_SHORT).show();
                     }
                 }
                 userAdapter.notifyDataSetChanged();

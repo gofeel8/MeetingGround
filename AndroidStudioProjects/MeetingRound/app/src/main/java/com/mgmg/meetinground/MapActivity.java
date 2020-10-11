@@ -408,23 +408,21 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                                 splitStr[0].length()-2); // 주소 parsing
                         String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
                         String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
-                        position = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
+                        LatLng pos = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
                         MarkerOptions markerOptions1=new MarkerOptions();
                         markerOptions1.title("click");
-                        markerOptions1.position(position);
+                        markerOptions1.position(pos);
 
                         BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click2);
                         Bitmap b=bitmapDrawable.getBitmap();
                         Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
                         markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
                         mMap.addMarker(markerOptions1);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                InputMethodManager imm=(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(editText.getWindowToken(),0);
                 return true;
             }
         });
@@ -489,17 +487,17 @@ public class MapActivity  extends AppCompatActivity implements OnMapReadyCallbac
                                 splitStr[0].length()-2); // 주소 parsing
                         String latitude=splitStr[10].substring(splitStr[10].indexOf("=")+1);
                         String longtitude=splitStr[12].substring(splitStr[12].indexOf("=")+1);
-                        position = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
+                        LatLng pos = new LatLng(Double.parseDouble(latitude),Double.parseDouble(longtitude));
                         MarkerOptions markerOptions1=new MarkerOptions();
                         markerOptions1.title("click");
-                        markerOptions1.position(position);
+                        markerOptions1.position(pos);
 
                         BitmapDrawable bitmapDrawable=(BitmapDrawable)getResources().getDrawable(R.drawable.click2);
                         Bitmap b=bitmapDrawable.getBitmap();
                         Bitmap smallMarker=Bitmap.createScaledBitmap(b,200,200,false);
                         markerOptions1.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
                         mMap.addMarker(markerOptions1);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
